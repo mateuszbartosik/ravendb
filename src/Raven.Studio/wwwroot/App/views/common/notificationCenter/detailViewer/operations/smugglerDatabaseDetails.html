@@ -43,6 +43,9 @@
                         <div class="status status-processed" data-bind="visible: stage === 'processed'">
                             <i class="icon-check"></i> <span>Processed</span>
                         </div>
+                        <!--<div class="status status-processed-with-errors" data-bind="visible: stage() === 'processed-with-errors'">
+                            <i class="icon-warning"></i> <span>Processed with errors</span>
+                        </div>-->
                         <div class="status status-errored" data-bind="visible: stage === 'error'">
                             <i class="icon-exclamation"></i> <span>Error</span>
                         </div>
