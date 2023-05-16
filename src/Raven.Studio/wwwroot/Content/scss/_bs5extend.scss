@@ -145,6 +145,14 @@
     bottom: 0;
 }
 
+.well {
+    background-color: $well-bg;
+}
+
+.border-radius-xs {
+    border-radius: $gutter-xs;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
