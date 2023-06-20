@@ -1,0 +1,120 @@
+$fonts-url: "../css/fonts/";
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 300;
+    src: local("Figtree Light"), url(#{$fonts-url}Figtree-Light.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Light.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Figtree"), url(#{$fonts-url}Figtree-Regular.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Regular.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 500;
+    src: local("Figtree Medium"), url(#{$fonts-url}Figtree-Medium.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Medium.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 600;
+    src: local("Figtree SemiBold"), url(#{$fonts-url}Figtree-SemiBold.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-SemiBold.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 700;
+    src: local("Figtree Bold"), url(#{$fonts-url}Figtree-Bold.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Bold.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 800;
+    src: local("Figtree Extra Bold"), url(#{$fonts-url}Figtree-ExtraBold.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-ExtraBold.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: normal;
+    font-weight: 900;
+    src: local("Figtree Black"), url(#{$fonts-url}Figtree-Black.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Black.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 300;
+    src: local("Figtree Light Italic"), url(#{$fonts-url}Figtree-LightItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-LightItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 400;
+    src: local("Figtree Italic"), url(#{$fonts-url}Figtree-Italic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-Italic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 500;
+    src: local("Figtree Medium Italic"), url(#{$fonts-url}Figtree-MediumItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-MediumItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 500;
+    src: local("Figtree Medium Italic"), url(#{$fonts-url}Figtree-MediumItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-MediumItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 600;
+    src: local("Figtree SemiBold Italic"), url(#{$fonts-url}Figtree-SemiBoldItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-SemiBoldItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 700;
+    src: local("Figtree Bold Italic"), url(#{$fonts-url}Figtree-BoldItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-BoldItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 800;
+    src: local("Figtree ExtraBold Italic"), url(#{$fonts-url}Figtree-ExtraBoldItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-ExtraBoldItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: "Figtree";
+    font-style: italic;
+    font-weight: 900;
+    src: local("Figtree Bold Italic"), url(#{$fonts-url}Figtree-BlackItalic.woff2) format("woff2"),
+        url(#{$fonts-url}Figtree-BlackItalic.otf) format("opentype");
+}

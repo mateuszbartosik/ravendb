@@ -10,10 +10,9 @@
 @import "../../../node_modules/boostrap5/scss/mixins";
 @import "../../../node_modules/boostrap5/scss/utilities";
 @import "../../../node_modules/boostrap5/scss/root";
-
+@import "../../../node_modules/boostrap5/scss/reboot";
 .bs5 {
     // Optional Bootstrap components
-    @import "../../../node_modules/boostrap5/scss/reboot";
     @import "../../../node_modules/boostrap5/scss/type";
     @import "../../../node_modules/boostrap5/scss/images";
     @import "../../../node_modules/boostrap5/scss/containers";
@@ -57,7 +56,7 @@
 }
 
 @import "../scss/pages/cluster-dashboard.scss";
-
+@import "../scss/fonts";
 @import "../scss/custom-properties";
 @import "../scss/main-menu";
 @import "../../../node_modules/boostrap5/scss/popover";

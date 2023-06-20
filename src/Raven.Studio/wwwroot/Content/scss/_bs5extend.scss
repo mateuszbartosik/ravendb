@@ -49,6 +49,12 @@
     outline-offset: 3px;
 }
 
+.simple-item-list {
+    & > div + div {
+        border-top: $border-width solid $border-color-light-var;
+    }
+}
+
 // Button Group With Label
 .btn-group-label {
     border-top: 1px solid $gray-300;
@@ -123,8 +129,6 @@
 
 .form-control,
 .form-select {
-    min-height: 37px;
-
     &::placeholder {
         color: $text-muted-var;
         opacity: 0.5;
@@ -159,6 +163,10 @@
             }
         }
     }
+}
+
+.add-hover:hover {
+    filter: $hover-filter;
 }
 
 // Vertical separator inside the badge
@@ -323,4 +331,82 @@ select {
     color: $input-color;
     background-color: $input-bg;
     border: $input-border-width solid $input-border-color;
+}
+.well {
+    background-color: $well-bg-var;
+}
+
+@keyframes bounce {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    25% {
+        transform: scale(0.85);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    75% {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes blink {
+    0% {
+        box-shadow: 0 0 0 0 $info;
+        background-color: $info;
+    }
+
+    100% {
+        box-shadow: 0 0 0 5px opacify($info, 0);
+        background-color: opacify($info, 0);
+    }
+}
+
+@keyframes blink-round {
+    0% {
+        box-shadow: 0 0 0 0 $info;
+        background-color: $info;
+        border-radius: 50%;
+    }
+
+    100% {
+        box-shadow: 0 0 0 7px opacify($info, 0);
+        background-color: opacify($info, 0);
+        border-radius: 50%;
+    }
+}
+
+$bounce-properties: bounce 0.5s 1 cubic-bezier(0, 0.25, 0.75, 1);
+$blink-properties: blink 0.75s 1 cubic-bezier(0, 0.6, 0.4, 1);
+$blink-round-properties: blink-round 0.75s 1 cubic-bezier(0, 0.6, 0.4, 1);
+
+.bounce {
+    animation: $bounce-properties;
+}
+
+.blink-style-basic {
+    animation: $blink-properties;
+    animation-duration: 2s;
+}
+
+.blink-style {
+    animation: $blink-properties;
+}
+
+.blink-round-style {
+    animation: $blink-round-properties;
+>>>>>>> 61daa55468 (RavenDB-20537 Move 'Document Compression' view to React)
 }

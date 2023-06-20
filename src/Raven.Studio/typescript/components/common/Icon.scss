@@ -1,4 +1,31 @@
-﻿[class*=" icon-addon-"],
+﻿[class*=" icon-"],
+[class^="icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: "icomoon" !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    position: relative;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    //top: .1em;
+    line-height: 70%;
+    font-size: 120%;
+    vertical-align: -0.175em;
+
+    &::after {
+        position: absolute;
+        bottom: 8%;
+        right: -4%;
+        font-size: 50%;
+        line-height: 50%;
+    }
+}
+
+[class*=" icon-addon-"],
 [class^="icon-addon-"] {
     &::before {
         clip-path: polygon(
@@ -19,5 +46,21 @@
             60% 100%,
             0 100%
         );
+    }
+}
+
+.icon-lg {
+    font-size: 38px;
+}
+
+.icon-xl {
+    display: block;
+    text-align: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+
+    &:before {
+        display: inline-block;
+        font-size: 58px;
     }
 }
