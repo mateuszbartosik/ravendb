@@ -256,4 +256,11 @@ export class DatabasesStubs {
             LastError: null,
         };
     }
+
+    private static statusNotResponding(): DatabaseGroupNodeStatus {
+        return {
+            LastStatus: "NotResponding",
+            LastError: null,
+        };
+    }
 }
