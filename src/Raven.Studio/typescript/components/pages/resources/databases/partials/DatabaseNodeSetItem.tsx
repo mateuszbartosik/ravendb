@@ -6,12 +6,7 @@ import assertUnreachable from "components/utils/assertUnreachable";
 export function DatabaseNodeSetItem(props: { node: NodeInfo }) {
     const { node } = props;
     return (
-        <NodeSetItem
-            key={node.tag}
-            icon={iconForNodeType(node.type)}
-            color={colorForNodeType(node.type)}
-            title={node.type}
-        >
+        <NodeSetItem key={node.tag} icon={iconForNodeType(node.type)} color={differNodeStatus(node)} title={node.type}>
             {node.tag}
         </NodeSetItem>
     );
@@ -27,6 +22,14 @@ function colorForNodeType(type: databaseGroupNodeType) {
             return "warning";
         default:
             assertUnreachable(type);
+    }
+}
+
+function differNodeStatus(node: NodeInfo): string {
+    if (node.lastStatus === "NotResponding") {
+        return "secondary";
+    } else {
+        return colorForNodeType(node.type);
     }
 }
 
