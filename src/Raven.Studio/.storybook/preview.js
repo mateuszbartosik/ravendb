@@ -44,6 +44,7 @@ dialog.install({});
 import pluginWidget from "plugins/widget";
 pluginWidget.install({});
 
+import { ThemeProvider } from './addons/ThemeSwitcher/index';
 
 import { commonInit } from "components/common/shell/setup";
 
@@ -61,8 +62,16 @@ studioSettings.default.configureLoaders(mockJQueryPromise, mockJQueryPromise, mo
 
 import { Provider } from "react-redux";
 
-
 export const decorators = [
+    (Story, context) => {
+        const theme = context.globals.theme;
+
+        return (
+        <ThemeProvider theme={theme}>
+            <Story />
+        </ThemeProvider>
+        );
+    },
     (Story) => {
         jest.resetAllMocks();
 
@@ -71,7 +80,6 @@ export const decorators = [
             setEffectiveTestStore(storeConfiguration);
             return storeConfiguration;
         });
-        
         return (
             <Provider store={store}>
                 <div>
@@ -95,32 +103,20 @@ export const parameters = {
     values: [
       {
         name: 'default-body',
-        value: '#181826',
-      },
-      {
-        name: 'default-panel',
-        value: '#1e1f2b',
-      },
-      {
-        name: 'default-panel-header',
-        value: '#262936',
-      },
-      {
-        name: 'blue-body',
-        value: '#172138',
-      },
-      {
-        name: 'blue-panel',
-        value: '#e1e3ef',
-      },
-      {
-        name: 'blue-panel-header',
-        value: '#f4f5fb',
-      },
-      {
-        name: 'light-body',
-        value: '#dbdde3',
-      },      
+        value: 'var(--bs-body-bg)',
+      }
     ],
   },
 }
+
+  export const globalTypes = {
+    theme: {
+      name: 'Theme',
+      description: 'Global theme for components',
+      defaultValue: 'default',
+      toolbar: {
+        icon: 'circlehollow',
+        items: ['default', 'blue', 'light']
+      },
+    },
+  };
