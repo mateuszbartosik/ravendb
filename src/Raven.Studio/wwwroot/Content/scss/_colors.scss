@@ -326,7 +326,7 @@ $grays: (
     "600": $gray-600,
     "700": $gray-700,
     "800": $gray-800,
-    "900": $gray-900,
+    "900": $gray-900
 ) !default;
 // scss-docs-end gray-colors-map
 // fusv-enable
@@ -358,7 +358,7 @@ $colors: (
     "cyan": $cyan,
     "white": $white,
     "gray": $gray-600,
-    "gray-dark": $gray-800,
+    "gray-dark": $gray-800
 ) !default;
 // scss-docs-end colors-map
 
@@ -376,6 +376,9 @@ $theme-colors: (
     "shard": $shard-color,
     "orchestrator": $orchestrator-color,
     "progress": $progress-color,
+    "community": $color-3-3,
+    "professional": $color-4-2,
+    "enterprise": $color-5
 ) !default;
 
 // scss-docs-end theme-colors-map

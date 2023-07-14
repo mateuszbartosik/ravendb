@@ -61,7 +61,7 @@
 
 .about-view-accordion {
     .description {
-        font-size: 0.75rem;
+        font-size: 0.8125rem;
         color: var(--text-muted);
     }
     .tab-icon {
@@ -94,7 +94,7 @@
         $shadow-classes: (
             info: 0 0 100px 0 inset rgba(var(--bs-info-rgb), 0.2),
             success: 0 0 100px 0 inset rgba(var(--bs-success-rgb), 0.2),
-            warning: 0 0 100px 0 inset rgba(var(--bs-warning-rgb), 0.2),
+            warning: 0 0 100px 0 inset rgba(var(--bs-warning-rgb), 0.2)
         );
         @each $class, $shadow in $shadow-classes {
             &.box-shadow-#{$class} {
@@ -115,6 +115,7 @@
         display: flex;
         align-items: center;
         gap: 0.625rem;
+        font-size: 1rem;
         &.community {
             &:before {
                 background-color: colors.$color-3-3;

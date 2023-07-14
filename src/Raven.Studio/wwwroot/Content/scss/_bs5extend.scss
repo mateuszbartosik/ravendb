@@ -128,7 +128,9 @@
 }
 
 .form-control,
-.form-select {
+.form-select,
+.form-dropdown-select {
+    min-height: 37px;
     &::placeholder {
         color: $text-muted-var;
         opacity: 0.5;
@@ -408,5 +410,4 @@ $blink-round-properties: blink-round 0.75s 1 cubic-bezier(0, 0.6, 0.4, 1);
 
 .blink-round-style {
     animation: $blink-round-properties;
->>>>>>> 61daa55468 (RavenDB-20537 Move 'Document Compression' view to React)
 }

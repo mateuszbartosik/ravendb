@@ -124,7 +124,7 @@ export const AnchoredHub: ComponentStory<typeof AboutViewAnchored> = () => {
                                 color="info"
                                 heading="About this view"
                                 description="Get additional info on what this feature can offer you"
-                                targetId="1"
+                                targetId="aboutView"
                             >
                                 <p>
                                     <strong>Admin JS Console</strong> is a specialized feature primarily intended for
@@ -146,7 +146,7 @@ export const AnchoredHub: ComponentStory<typeof AboutViewAnchored> = () => {
                                 color="success"
                                 heading="Examples of use"
                                 description="Learn how to get the most of this feature"
-                                targetId="2"
+                                targetId="examplesOfUse"
                             >
                                 <p>
                                     <strong>To set the refresh time:</strong> enter the appropriate date in the metadata{" "}
@@ -163,7 +163,7 @@ export const AnchoredHub: ComponentStory<typeof AboutViewAnchored> = () => {
                                 color="warning"
                                 heading="Licensing"
                                 description="See which plans offer this and more exciting features"
-                                targetId="3"
+                                targetId="licensing"
                                 pill
                                 pillText="Upgrade available"
                                 pillIcon="star-filled"

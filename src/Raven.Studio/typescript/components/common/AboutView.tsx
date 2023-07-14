@@ -29,11 +29,12 @@ interface AboutViewHeadingProps {
 
 const AboutViewHeading = (props: AboutViewHeadingProps) => {
     const { title, icon, badge, badgeText } = props;
+    const badgeColor = badgeText ? `faded-${badgeText.toLowerCase()}` : "faded-primary";
     return (
         <h2 className="d-flex align-items-center gap-1 mb-5">
             <Icon icon={icon} /> {title}{" "}
             {badge && (
-                <Badge color="faded-primary" className="about-view-title-badge">
+                <Badge color={badgeColor} className="about-view-title-badge">
                     {badgeText}
                 </Badge>
             )}
@@ -108,7 +109,7 @@ const AboutViewAnchored = (props: AboutViewProps) => {
 
     return (
         <div className={classNames(className)}>
-            <UncontrolledAccordion flush stayOpen className="bs5 about-view-accordion">
+            <UncontrolledAccordion flush className="bs5 about-view-accordion" defaultOpen={["licensing"]} stayOpen>
                 {children}
             </UncontrolledAccordion>
         </div>
