@@ -202,3 +202,30 @@ $directions: ("top", "right", "bottom", "left");
         --pulse-bg: var(--bs-danger-rgb);
     }
 }
+
+    ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        height: 56px;
+        border-radius: 8px;
+        border: 4px solid transparent;
+        background-clip: content-box;
+        background-color: $gray-600;
+        transition: all 0.33s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+            background-color: $gray-500;
+            transition: none;
+        }
+
+        &:active {
+            background-color: $primary;
+        }
+    }
