@@ -10,6 +10,7 @@ import { databasesViewSlice } from "components/pages/resources/databases/store/d
 import { licenseSlice } from "./common/shell/licenseSlice";
 import { documentRevisionsSlice } from "./pages/database/settings/documentRevisions/store/documentRevisionsSlice";
 import { collectionsTrackerSlice } from "./common/shell/collectionsTrackerSlice";
+import { connectionStringsSlice } from "./pages/database/settings/connectionStrings/store/connectionStringsSlice";
 
 const listenerMiddleware = createListenerMiddleware({
     extra: () => services,
@@ -26,6 +27,7 @@ export function createStoreConfiguration() {
             license: licenseSlice.reducer,
             documentRevisions: documentRevisionsSlice.reducer,
             collectionsTracker: collectionsTrackerSlice.reducer,
+            connectionStrings: connectionStringsSlice.reducer,
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
