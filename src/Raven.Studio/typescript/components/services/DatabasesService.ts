@@ -54,6 +54,7 @@ import testClusterNodeConnectionCommand = require("commands/database/cluster/tes
 import getConnectionStringsCommand = require("commands/database/settings/getConnectionStringsCommand");
 import deleteConnectionStringCommand = require("commands/database/settings/deleteConnectionStringCommand");
 import revertRevisionsCommand = require("commands/database/documents/revertRevisionsCommand");
+import testSqlConnectionStringCommand = require("commands/database/cluster/testSqlConnectionStringCommand");
 
 export default class DatabasesService {
     async setLockMode(databases: DatabaseSharedInfo[], newLockMode: DatabaseLockMode) {
@@ -227,5 +228,9 @@ export default class DatabasesService {
 
     async testClusterNodeConnection(serverUrl: string, databaseName?: string, bidirectional = true) {
         return new testClusterNodeConnectionCommand(serverUrl, databaseName, bidirectional).execute();
+    }
+
+    async testSqlConnectionString(db: database, connectionString: string, factoryName: string) {
+        return new testSqlConnectionStringCommand(db, connectionString, factoryName).execute();
     }
 }
