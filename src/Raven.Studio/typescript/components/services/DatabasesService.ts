@@ -56,6 +56,7 @@ import deleteConnectionStringCommand = require("commands/database/settings/delet
 import revertRevisionsCommand = require("commands/database/documents/revertRevisionsCommand");
 import testSqlConnectionStringCommand = require("commands/database/cluster/testSqlConnectionStringCommand");
 import testRabbitMqServerConnectionCommand = require("commands/database/cluster/testRabbitMqServerConnectionCommand");
+import testKafkaServerConnectionCommand = require("commands/database/cluster/testKafkaServerConnectionCommand");
 
 export default class DatabasesService {
     async setLockMode(databases: DatabaseSharedInfo[], newLockMode: DatabaseLockMode) {
@@ -237,5 +238,21 @@ export default class DatabasesService {
 
     async testRabbitMqServerConnection(db: database, connectionString: string) {
         return new testRabbitMqServerConnectionCommand(db, connectionString).execute();
+    }
+
+    async testKafkaServerConnection(
+        db: database,
+        bootstrapServers: string,
+        useServerCertificate: boolean,
+        connectionOptionsDto: {
+            [optionKey: string]: string;
+        }
+    ) {
+        return new testKafkaServerConnectionCommand(
+            db,
+            bootstrapServers,
+            useServerCertificate,
+            connectionOptionsDto
+        ).execute();
     }
 }
