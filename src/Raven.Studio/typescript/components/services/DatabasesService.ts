@@ -55,6 +55,7 @@ import getConnectionStringsCommand = require("commands/database/settings/getConn
 import deleteConnectionStringCommand = require("commands/database/settings/deleteConnectionStringCommand");
 import revertRevisionsCommand = require("commands/database/documents/revertRevisionsCommand");
 import testSqlConnectionStringCommand = require("commands/database/cluster/testSqlConnectionStringCommand");
+import testRabbitMqServerConnectionCommand = require("commands/database/cluster/testRabbitMqServerConnectionCommand");
 
 export default class DatabasesService {
     async setLockMode(databases: DatabaseSharedInfo[], newLockMode: DatabaseLockMode) {
@@ -232,5 +233,9 @@ export default class DatabasesService {
 
     async testSqlConnectionString(db: database, connectionString: string, factoryName: string) {
         return new testSqlConnectionStringCommand(db, connectionString, factoryName).execute();
+    }
+
+    async testRabbitMqServerConnection(db: database, connectionString: string) {
+        return new testRabbitMqServerConnectionCommand(db, connectionString).execute();
     }
 }
