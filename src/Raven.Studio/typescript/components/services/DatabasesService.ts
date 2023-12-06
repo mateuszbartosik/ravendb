@@ -57,6 +57,7 @@ import revertRevisionsCommand = require("commands/database/documents/revertRevis
 import testSqlConnectionStringCommand = require("commands/database/cluster/testSqlConnectionStringCommand");
 import testRabbitMqServerConnectionCommand = require("commands/database/cluster/testRabbitMqServerConnectionCommand");
 import testKafkaServerConnectionCommand = require("commands/database/cluster/testKafkaServerConnectionCommand");
+import testElasticSearchNodeConnectionCommand = require("commands/database/cluster/testElasticSearchNodeConnectionCommand");
 
 export default class DatabasesService {
     async setLockMode(databases: DatabaseSharedInfo[], newLockMode: DatabaseLockMode) {
@@ -254,5 +255,13 @@ export default class DatabasesService {
             useServerCertificate,
             connectionOptionsDto
         ).execute();
+    }
+
+    async testElasticSearchNodeConnection(
+        db: database,
+        serverUrl: string,
+        authenticationDto: Raven.Client.Documents.Operations.ETL.ElasticSearch.Authentication
+    ) {
+        return new testElasticSearchNodeConnectionCommand(db, serverUrl, authenticationDto).execute();
     }
 }
