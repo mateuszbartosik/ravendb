@@ -48,16 +48,7 @@ import getCustomAnalyzersCommand = require("commands/database/settings/getCustom
 import getDocumentsCompressionConfigurationCommand = require("commands/database/documents/getDocumentsCompressionConfigurationCommand");
 import saveDocumentsCompressionCommand = require("commands/database/documents/saveDocumentsCompressionCommand");
 import promoteDatabaseNodeCommand = require("commands/database/debug/promoteDatabaseNodeCommand");
-import saveConnectionStringCommand = require("commands/database/settings/saveConnectionStringCommand");
-import { ConnectionStringDto } from "components/pages/database/settings/connectionStrings/connectionStringsTypes";
-import testClusterNodeConnectionCommand = require("commands/database/cluster/testClusterNodeConnectionCommand");
-import getConnectionStringsCommand = require("commands/database/settings/getConnectionStringsCommand");
-import deleteConnectionStringCommand = require("commands/database/settings/deleteConnectionStringCommand");
 import revertRevisionsCommand = require("commands/database/documents/revertRevisionsCommand");
-import testSqlConnectionStringCommand = require("commands/database/cluster/testSqlConnectionStringCommand");
-import testRabbitMqServerConnectionCommand = require("commands/database/cluster/testRabbitMqServerConnectionCommand");
-import testKafkaServerConnectionCommand = require("commands/database/cluster/testKafkaServerConnectionCommand");
-import testElasticSearchNodeConnectionCommand = require("commands/database/cluster/testElasticSearchNodeConnectionCommand");
 
 export default class DatabasesService {
     async setLockMode(databases: DatabaseSharedInfo[], newLockMode: DatabaseLockMode) {
@@ -211,57 +202,5 @@ export default class DatabasesService {
 
     async promoteDatabaseNode(databaseName: string, nodeTag: string) {
         return new promoteDatabaseNodeCommand(databaseName, nodeTag).execute();
-    }
-
-    async getConnectionStrings(db: database) {
-        return new getConnectionStringsCommand(db).execute();
-    }
-
-    async saveConnectionString(db: database, connectionString: ConnectionStringDto) {
-        return new saveConnectionStringCommand(db, connectionString).execute();
-    }
-
-    async deleteConnectionString(
-        db: database,
-        type: Raven.Client.Documents.Operations.ETL.EtlType,
-        connectionStringName: string
-    ) {
-        return new deleteConnectionStringCommand(db, type, connectionStringName).execute();
-    }
-
-    async testClusterNodeConnection(serverUrl: string, databaseName?: string, bidirectional = true) {
-        return new testClusterNodeConnectionCommand(serverUrl, databaseName, bidirectional).execute();
-    }
-
-    async testSqlConnectionString(db: database, connectionString: string, factoryName: string) {
-        return new testSqlConnectionStringCommand(db, connectionString, factoryName).execute();
-    }
-
-    async testRabbitMqServerConnection(db: database, connectionString: string) {
-        return new testRabbitMqServerConnectionCommand(db, connectionString).execute();
-    }
-
-    async testKafkaServerConnection(
-        db: database,
-        bootstrapServers: string,
-        useServerCertificate: boolean,
-        connectionOptionsDto: {
-            [optionKey: string]: string;
-        }
-    ) {
-        return new testKafkaServerConnectionCommand(
-            db,
-            bootstrapServers,
-            useServerCertificate,
-            connectionOptionsDto
-        ).execute();
-    }
-
-    async testElasticSearchNodeConnection(
-        db: database,
-        serverUrl: string,
-        authenticationDto: Raven.Client.Documents.Operations.ETL.ElasticSearch.Authentication
-    ) {
-        return new testElasticSearchNodeConnectionCommand(db, serverUrl, authenticationDto).execute();
     }
 }
