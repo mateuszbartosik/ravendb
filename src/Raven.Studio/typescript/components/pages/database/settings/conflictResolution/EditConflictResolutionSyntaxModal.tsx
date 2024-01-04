@@ -4,19 +4,12 @@ import Code from "components/common/Code";
 
 interface EditConflictResolutionSyntaxModalProps {
     toggle: () => void;
-    isOpen: boolean;
 }
 
 export function EditConflictResolutionSyntaxModal(props: EditConflictResolutionSyntaxModalProps) {
-    const { toggle, isOpen } = props;
+    const { toggle } = props;
     return (
-        <Modal
-            size="lg"
-            wrapClassName="bs5"
-            isOpen={isOpen}
-            toggle={toggle}
-            contentClassName="modal-border bulge-primary"
-        >
+        <Modal size="lg" wrapClassName="bs5" toggle={toggle} contentClassName="modal-border bulge-primary">
             <ModalBody>
                 <div className="position-absolute m-2 end-0 top-0">
                     <Button close onClick={toggle} />

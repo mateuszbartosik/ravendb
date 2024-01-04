@@ -6,44 +6,58 @@ import {
     RichPanelName,
     RichPanelActions,
     RichPanelDetails,
+    RichPanelDetailItem,
 } from "components/common/RichPanel";
 import { Button, Collapse, InputGroup, Label, UncontrolledTooltip } from "reactstrap";
 import { Icon } from "components/common/Icon";
-import { FormAceEditor, FormSelectCreatable } from "components/common/Form";
 import { EditConflictResolutionSyntaxModal } from "components/pages/database/settings/conflictResolution/EditConflictResolutionSyntaxModal";
-import { useAppSelector } from "components/store";
+import { useAppDispatch, useAppSelector } from "components/store";
 import { collectionsTrackerSelectors } from "components/common/shell/collectionsTrackerSlice";
 import { SelectOption } from "components/common/select/Select";
-import { useForm } from "react-hook-form";
 import useBoolean from "hooks/useBoolean";
 import useId from "hooks/useId";
-import useConfirm from "components/common/ConfirmDialog";
+import SelectCreatable from "components/common/select/SelectCreatable";
+import AceEditor from "components/common/AceEditor";
+import genUtils from "common/generalUtils";
+import { ConflictResolutionCollectionConfig, conflictResolutionActions } from "./store/conflictResolutionSlice";
 
 interface ConflictResolutionConfigPanelProps {
     isDatabaseAdmin: boolean;
+    initialCollectionsConfig: ConflictResolutionCollectionConfig;
 }
 
-export default function ConflictResolutionConfigPanel(props: ConflictResolutionConfigPanelProps) {
-    const { isDatabaseAdmin } = props;
-
+export default function ConflictResolutionConfigPanel({
+    isDatabaseAdmin,
+    initialCollectionsConfig,
+}: ConflictResolutionConfigPanelProps) {
     const allCollectionNames = useAppSelector(collectionsTrackerSelectors.collectionNames).filter(
         (x) => x !== "@empty" && x !== "@hilo"
     );
 
-    const { value: panelCollapsed, toggle: togglePanelCollapsed } = useBoolean(true);
+    // TODO use form? and validate if select is not on list
 
-    const [customCollectionOptions] = useState<SelectOption[]>([]);
+    const dispatch = useAppDispatch();
+    const [collection, setCollection] = useState(initialCollectionsConfig.name);
+    const [script, setScript] = useState(initialCollectionsConfig.script);
 
-    const { control } = useForm<null>({});
-
-    const [isSyntaxModalOpen, setSyntaxModalOpen] = useState(false);
-
-    const toggleSyntaxModalOpen = () => {
-        setSyntaxModalOpen(!isSyntaxModalOpen);
-    };
+    const { value: isSyntaxModalOpen, toggle: toggleIsSyntaxModalOpen } = useBoolean(false);
 
     const scriptPanelId = useId("scriptPanel");
     const unsavedChangesId = useId("unsavedChanges");
+
+    const saveEdit = () => {
+        dispatch(
+            conflictResolutionActions.saveEdit({
+                oldName: initialCollectionsConfig.name,
+                newConfig: {
+                    name: collection,
+                    script,
+                },
+            })
+        );
+    };
+
+    const collectionOptions = allCollectionNames.map((x) => ({ label: x, value: x }));
 
     return (
         <RichPanel className="flex-row" id={scriptPanelId}>
@@ -51,7 +65,7 @@ export default function ConflictResolutionConfigPanel(props: ConflictResolutionC
                 <RichPanelHeader>
                     <RichPanelInfo>
                         <RichPanelName>
-                            Collection name
+                            {collection ?? "Collection name"}
                             <span id={unsavedChangesId} className="text-warning">
                                 *
                             </span>
@@ -61,40 +75,99 @@ export default function ConflictResolutionConfigPanel(props: ConflictResolutionC
                         </RichPanelName>
                     </RichPanelInfo>
                     <RichPanelActions>
-                        {isDatabaseAdmin && (
+                        {isDatabaseAdmin ? (
+                            initialCollectionsConfig.isInEditMode ? (
+                                <>
+                                    <Button color="success" title="Save changes" onClick={saveEdit}>
+                                        <Icon icon="save" margin="m-0" /> Save
+                                    </Button>
+                                    <Button
+                                        color="secondary"
+                                        title="Cancel changes"
+                                        onClick={() => dispatch(conflictResolutionActions.discardEdit(collection))}
+                                    >
+                                        <Icon icon="cancel" margin="m-0" /> Discard
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        color="secondary"
+                                        title="Edit this script"
+                                        onClick={() => dispatch(conflictResolutionActions.edit(collection))}
+                                    >
+                                        <Icon icon="edit" margin="m-0" />
+                                    </Button>
+                                    <Button
+                                        color="danger"
+                                        title="Delete this script"
+                                        onClick={() => dispatch(conflictResolutionActions.delete(collection))}
+                                    >
+                                        <Icon icon="trash" margin="m-0" />
+                                    </Button>
+                                </>
+                            )
+                        ) : (
                             <>
-                                <Button color="secondary" title="Edit this script" onClick={togglePanelCollapsed}>
-                                    <Icon icon="edit" margin="m-0" />
-                                </Button>
-                                <Button color="danger" title="Delete this script">
-                                    <Icon icon="trash" margin="m-0" />
-                                </Button>
+                                {initialCollectionsConfig.isInEditMode ? (
+                                    <Button
+                                        color="secondary"
+                                        title="Hide this script"
+                                        onClick={() => dispatch(conflictResolutionActions.discardEdit(collection))}
+                                    >
+                                        <Icon icon="preview-off" margin="m-0" />
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        color="secondary"
+                                        title="Show this script"
+                                        onClick={() => dispatch(conflictResolutionActions.edit(collection))}
+                                    >
+                                        <Icon icon="preview" margin="m-0" />
+                                    </Button>
+                                )}
                             </>
                         )}
                     </RichPanelActions>
                 </RichPanelHeader>
-                <Collapse isOpen={!panelCollapsed}>
+                <Collapse isOpen={!initialCollectionsConfig.isInEditMode}>
+                    <RichPanelDetails>
+                        <RichPanelDetailItem
+                            label={
+                                <>
+                                    <Icon icon="clock" />
+                                    Last modified
+                                </>
+                            }
+                        >
+                            {genUtils.formatUtcDateAsLocal(initialCollectionsConfig.lastModifiedTime)}
+                        </RichPanelDetailItem>
+                    </RichPanelDetails>
+                </Collapse>
+                <Collapse isOpen={initialCollectionsConfig.isInEditMode}>
                     <RichPanelDetails className="vstack gap-3 p-3">
-                        <InputGroup className="vstack mb-1">
-                            <Label>Collection</Label>
-                            <FormSelectCreatable
-                                control={control}
-                                name="Collections"
-                                options={allCollectionNames.map((x) => ({ label: x, value: x }))}
-                                customOptions={customCollectionOptions}
-                                controlShouldRenderValue={false}
-                                isClearable={false}
-                                placeholder="Select collection (or enter a new one)"
-                                maxMenuHeight={300}
-                            />
-                        </InputGroup>
+                        {!initialCollectionsConfig.name && (
+                            <InputGroup className="vstack mb-1">
+                                <Label>Collection</Label>
+                                <SelectCreatable
+                                    options={collectionOptions}
+                                    value={collectionOptions.find((x) => x.value === collection)}
+                                    defaultValue={collectionOptions.find((x) => x.value === collection)}
+                                    onChange={(x: SelectOption) => setCollection(x.value)}
+                                    isClearable={false}
+                                    placeholder="Select collection (or enter a new one)"
+                                    maxMenuHeight={300}
+                                    isDisabled={!isDatabaseAdmin}
+                                />
+                            </InputGroup>
+                        )}
                         <InputGroup className="vstack">
                             <Label className="d-flex flex-wrap justify-content-between">
                                 Script
                                 <Button
                                     color="link"
                                     size="xs"
-                                    onClick={toggleSyntaxModalOpen}
+                                    onClick={toggleIsSyntaxModalOpen}
                                     className="p-0 align-self-end"
                                 >
                                     Syntax
@@ -102,16 +175,14 @@ export default function ConflictResolutionConfigPanel(props: ConflictResolutionC
                                 </Button>
                             </Label>
                             {isSyntaxModalOpen && (
-                                <EditConflictResolutionSyntaxModal
-                                    isOpen={isSyntaxModalOpen}
-                                    toggle={toggleSyntaxModalOpen}
-                                />
+                                <EditConflictResolutionSyntaxModal toggle={toggleIsSyntaxModalOpen} />
                             )}
-                            <FormAceEditor
-                                name="conflictResolutionScript"
-                                control={control}
-                                mode={"javascript"}
+                            <AceEditor
+                                mode="javascript"
                                 height="400px"
+                                value={script}
+                                onChange={setScript}
+                                readOnly={!isDatabaseAdmin}
                             />
                         </InputGroup>
                     </RichPanelDetails>
