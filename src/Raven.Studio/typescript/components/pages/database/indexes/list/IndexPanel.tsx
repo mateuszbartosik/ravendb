@@ -42,6 +42,7 @@ import { databaseSelectors } from "components/common/shell/databaseSliceSelector
 import { useAppSelector } from "components/store";
 import { accessManagerSelectors } from "components/common/shell/accessManagerSlice";
 import ResetIndexesButton from "components/pages/database/indexes/list/partials/ResetIndexesButton";
+import { todo } from "common/developmentHelper";
 
 export interface IndexPanelProps {
     index: IndexSharedInfo;
@@ -429,7 +430,7 @@ export function IndexPanelInternal(props: IndexPanelProps, ref: ForwardedRef<HTM
                             </div>
                         </RichPanelDetailItem>
                     )}
-
+                    <ReferencedCollections />
                     {(hasReplacement || isReplacement) && (
                         <RichPanelDetailItem>
                             {hasReplacement && (
@@ -538,5 +539,56 @@ function InlineDetails(props: InlineDetailsProps) {
         </>
     );
 }
+
+function ReferencedCollections() {
+    const referencedCollections = [
+        "Categories",
+        "Companies",
+        "Employees",
+        "Orders",
+        "Products",
+        "Regions",
+        "Shippers",
+        "Suppliers",
+    ];
+    todo(
+        "Feature",
+        "Marcin",
+        "Fill with real data",
+        "https://issues.hibernatingrhinos.com/issue/RavenDB-22196/Expose-Referenced-Collection-count-and-names-in-Indexes-View"
+    );
+    const referencedCollectionsId = useId("referencedCollections");
+    let referencedCollectionsItemCount = 0;
+
+    return (
+        referencedCollections.length > 0 && (
+            <RichPanelDetailItem id={referencedCollectionsId}>
+                <Icon icon="referenced-collections" title="Referenced collections" />
+                <div>
+                    {referencedCollections.map((referencedCollection, index) => {
+                        referencedCollectionsItemCount++;
+                        const isLastItem = index === referencedCollections.length - 1;
+                        const needsComma = !isLastItem;
+                        const needsLineBreak = referencedCollectionsItemCount === 5;
+
+                        if (needsLineBreak) {
+                            referencedCollectionsItemCount = 0;
+                        }
+
+                        return (
+                            <span key={index}>
+                                {referencedCollection}
+                                {needsComma && ", "}
+                                {needsLineBreak && <br />}
+                            </span>
+                        );
+                    })}
+                </div>
+            </RichPanelDetailItem>
+        )
+    );
+}
+
+export default ReferencedCollections;
 
 const indexUniqueId = (index: IndexSharedInfo) => "index_" + index.name;

@@ -15,6 +15,8 @@ import { Icon } from "components/common/Icon";
 import { EmptySet } from "components/common/EmptySet";
 import { statisticsViewSelectors } from "components/pages/database/status/statistics/store/statisticsViewSlice";
 import { databaseSelectors } from "components/common/shell/databaseSliceSelectors";
+import useId from "hooks/useId";
+import { todo } from "common/developmentHelper";
 
 interface IndexBlockProps {
     children: (locationData: PerLocationIndexStats, location: databaseLocationSpecifier) => JSX.Element;
@@ -39,6 +41,14 @@ function IndexStatistics(props: { indexName: string }) {
     const showMappedPerSecondRate = index.details.some((x) => x && x.mappedPerSecondRate > 1);
     const showReducedPerSecondRate = index.details.some((x) => x && x.reducedPerSecondRate > 1);
     const showReduceErrors = index.details.some((x) => x && x.reduceErrors > 0);
+
+    const referencedCollections = ["Collection 1", "Collection 2", "Collection 3"];
+    todo(
+        "Feature",
+        "Marcin",
+        "Fill with real data",
+        "https://issues.hibernatingrhinos.com/issue/RavenDB-22196/Expose-Referenced-Collection-count-and-names-in-Indexes-View"
+    );
 
     const { reportEvent } = useEventsCollector();
 
@@ -96,6 +106,12 @@ function IndexStatistics(props: { indexName: string }) {
                         <td>Entries Count</td>
                         <DetailsBlock index={index}>{(data) => <>{data.entriesCount.toLocaleString()}</>}</DetailsBlock>
                     </tr>
+                    {referencedCollections && (
+                        <tr>
+                            <td>Referenced Collections</td>
+                            <DetailsBlock index={index}>{referencedCollections.join(", ")}</DetailsBlock>
+                        </tr>
+                    )}
                     {showErrorCounts && (
                         <tr>
                             <td>Errors Count</td>
