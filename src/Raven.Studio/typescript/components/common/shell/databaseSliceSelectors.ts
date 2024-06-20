@@ -29,6 +29,10 @@ function selectDatabaseByName(name: string) {
 
 function selectActiveDatabase(store: RootState) {
     const activeDatabaseName = selectActiveDatabaseName(store);
+    if (!activeDatabaseName) {
+        return null;
+    }
+
     return selectDatabaseByName(activeDatabaseName)(store);
 }
 

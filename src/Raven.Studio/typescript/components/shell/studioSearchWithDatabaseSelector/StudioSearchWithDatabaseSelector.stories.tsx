@@ -11,11 +11,12 @@ export default {
 } satisfies Meta;
 
 export const Default = () => {
-    const { databasesService, indexesService } = mockServices;
+    const { databasesService, indexesService, tasksService } = mockServices;
     const { databases, collectionsTracker } = mockStore;
 
     databasesService.withDocumentsMetadataByIDPrefix();
     indexesService.withGetSampleStats();
+    tasksService.withGetTasks();
 
     databases.with_Sharded();
     databases.withActiveDatabase_NonSharded_SingleNode();

@@ -1,33 +1,56 @@
 import "./StudioSearch.scss";
-import classNames from "classnames";
 import { OmniSearch } from "common/omniSearch/omniSearch";
 import accessManager from "common/shell/accessManager";
 import databasesManager from "common/shell/databasesManager";
 import generateMenuItems from "common/shell/menu/generateMenuItems";
 import intermediateMenuItem from "common/shell/menu/intermediateMenuItem";
 import leafMenuItem from "common/shell/menu/leafMenuItem";
+import { EmptySet } from "components/common/EmptySet";
 import { Icon } from "components/common/Icon";
+import { clusterSelectors } from "components/common/shell/clusterSlice";
 import { collectionsTrackerSelectors } from "components/common/shell/collectionsTrackerSlice";
 import { databaseSelectors } from "components/common/shell/databaseSliceSelectors";
 import { useAppUrls } from "components/hooks/useAppUrls";
 import useBoolean from "components/hooks/useBoolean";
 import { useServices } from "components/hooks/useServices";
 import { useAppSelector } from "components/store";
+import DatabaseUtils from "components/utils/DatabaseUtils";
 import assertUnreachable from "components/utils/assertUnreachable";
 import { useAsyncDebounce } from "components/utils/hooks/useAsyncDebounce";
 import { RangeTuple } from "fuse.js";
 import router from "plugins/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAsync } from "react-async-hook";
 import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input, Row } from "reactstrap";
+import IconName from "typings/server/icons";
 
 type SearchItemType =
     | "serverMenuItem"
-    | "databaseMenuItem"
+    | "documentsMenuItem"
+    | "indexesMenuItem"
+    | "tasksMenuItem"
+    | "settingsMenuItem"
+    | "statsMenuItem"
     | "collection"
-    | "index"
     | "document"
-    | "recentDocument"
+    | "task"
+    | "index"
     | "database";
+
+interface SearchResult {
+    server: SearchResultItem[];
+    database: {
+        collections: SearchResultItem[];
+        documents: SearchResultItem[];
+        indexes: SearchResultItem[];
+        tasks: SearchResultItem[];
+        settings: SearchResultItem[];
+        stats: SearchResultItem[];
+    };
+    switchToDatabase: SearchResultItem[];
+}
+
+type SearchResultDatabaseGroup = keyof SearchResult["database"];
 
 type SearchInnerAction = {
     text: string;
@@ -35,46 +58,107 @@ type SearchInnerAction = {
 };
 
 type SearchItem = {
+    id: string;
     type: SearchItemType;
-    icon?: string;
-    onSelected: React.MouseEventHandler<HTMLElement>;
     text: string;
+    onSelected: React.MouseEventHandler<HTMLElement>;
     alternativeTexts?: string[];
+    route?: string;
+    icon?: IconName;
     innerActions?: SearchInnerAction[];
 };
 
 type SearchResultItem = {
+    id: string;
     type: SearchItemType;
-    icon?: string;
-    onSelected: React.MouseEventHandler<HTMLElement>;
     text: string;
+    onSelected: React.MouseEventHandler<HTMLElement>;
+    icon?: IconName;
+    route?: string;
     indices?: readonly RangeTuple[];
     innerActionText?: string;
     innerActionIndices?: readonly RangeTuple[];
+};
+
+type OngoingTaskWithBroker = Raven.Client.Documents.Operations.OngoingTasks.OngoingTask & {
+    BrokerType?: Raven.Client.Documents.Operations.ETL.Queue.QueueBrokerType;
 };
 
 export default function StudioSearch() {
     const { value: isSearchDropdownOpen, toggle: toggleIsSearchDropdownOpen } = useBoolean(false);
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [results, setResults] = useState<Record<SearchItemType, SearchResultItem[]>>({
-        serverMenuItem: [],
-        databaseMenuItem: [],
-        collection: [],
-        index: [],
-        document: [],
-        recentDocument: [],
-        database: [],
-    });
+    const [results, setResults] = useState<SearchResult>(emptyResult);
 
+    const localNodeTag = useAppSelector(clusterSelectors.localNodeTag);
+    const activeDatabase = useAppSelector(databaseSelectors.activeDatabase);
     const activeDatabaseName = useAppSelector(databaseSelectors.activeDatabaseName);
     const allDatabaseNames = useAppSelector(databaseSelectors.allDatabaseNames);
     const collections = useAppSelector(collectionsTrackerSelectors.collections);
+    const location = useMemo(
+        () => (activeDatabase ? DatabaseUtils.getFirstLocation(activeDatabase, localNodeTag) : null),
+        [activeDatabase, localNodeTag]
+    );
 
     const omniSearch = useMemo(() => new OmniSearch<SearchItem, SearchItemType>(), []);
     const menuItems = useMemo(() => generateMenuItems(activeDatabaseName), [activeDatabaseName]);
 
-    const { databasesService } = useServices();
+    const { databasesService, indexesService, tasksService } = useServices();
+
+    useAsync(
+        async () => {
+            if (!activeDatabaseName) {
+                return [];
+            }
+            return tasksService.getOngoingTasks(activeDatabaseName, location);
+        },
+        [activeDatabaseName, location],
+        {
+            onSuccess(results: Raven.Server.Web.System.OngoingTasksResult) {
+                const ongoingTasks: SearchItem[] = (results.OngoingTasks as OngoingTaskWithBroker[]).map((x) => ({
+                    id: _.uniqueId("task-"),
+                    type: "task",
+                    icon: "ongoing-tasks",
+                    text: x.TaskName,
+                    onSelected: (e) => goToTask(x.TaskType, x.BrokerType, x.TaskId, e),
+                }));
+
+                const pullReplications: SearchItem[] = results.PullReplications.map((x) => ({
+                    id: _.uniqueId("task-"),
+                    type: "task",
+                    icon: "replication",
+                    text: x.Name,
+                    onSelected: (e) => goToReplication(x.Mode, x.TaskId, e),
+                }));
+
+                omniSearch.register("task", [...ongoingTasks, ...pullReplications]);
+            },
+        }
+    );
+
+    useAsync(
+        async () => {
+            if (!activeDatabaseName) {
+                return [];
+            }
+            return indexesService.getStats(activeDatabaseName, location);
+        },
+        [activeDatabaseName, location],
+        {
+            onSuccess(results) {
+                omniSearch.register(
+                    "index",
+                    results.map((x) => ({
+                        id: _.uniqueId("index-"),
+                        type: "index",
+                        icon: "index",
+                        text: x.Name,
+                        onSelected: (e) => goToIndex(x.Name, e),
+                    }))
+                );
+            },
+        }
+    );
 
     useAsyncDebounce(
         async (searchQuery, activeDatabaseName) => {
@@ -93,8 +177,9 @@ export default function StudioSearch() {
                 omniSearch.register(
                     "document",
                     mappedResults.map((result) => ({
+                        id: _.uniqueId("document-"),
                         type: "document",
-                        icon: "icon-document",
+                        icon: "document",
                         text: result,
                         onSelected: (e) => goToDocument(result, e),
                         subText: null,
@@ -154,35 +239,143 @@ export default function StudioSearch() {
         [activeDatabaseName, appUrl, goToUrl]
     );
 
+    const goToTask = useCallback(
+        (
+            taskType: Raven.Client.Documents.Operations.OngoingTasks.OngoingTaskType,
+            brokerType: Raven.Client.Documents.Operations.ETL.Queue.QueueBrokerType,
+            taskId: number,
+            event: React.MouseEvent<HTMLElement, MouseEvent>
+        ) => {
+            const getUrlFromProvider = (provider: (db: string, taskId?: number) => string) => {
+                return provider(activeDatabaseName, taskId);
+            };
+
+            const getUrl = () => {
+                switch (taskType) {
+                    case "ElasticSearchEtl":
+                        return getUrlFromProvider(appUrl.forEditElasticSearchEtl);
+                    case "SqlEtl":
+                        return getUrlFromProvider(appUrl.forEditSqlEtl);
+
+                    case "RavenEtl":
+                        return getUrlFromProvider(appUrl.forEditRavenEtl);
+
+                    case "Subscription":
+                        return getUrlFromProvider(appUrl.forEditSubscription);
+
+                    case "Replication":
+                        return getUrlFromProvider(appUrl.forEditExternalReplication);
+
+                    case "PullReplicationAsSink":
+                        return getUrlFromProvider(appUrl.forEditReplicationSink);
+
+                    case "PullReplicationAsHub":
+                        return getUrlFromProvider(appUrl.forEditReplicationHub);
+
+                    case "OlapEtl":
+                        return getUrlFromProvider(appUrl.forEditOlapEtl);
+
+                    case "Backup":
+                        return appUrl.forEditPeriodicBackupTask("Backups", "OngoingTasks", taskId);
+
+                    case "QueueEtl": {
+                        if (brokerType === "Kafka") {
+                            return getUrlFromProvider(appUrl.forEditKafkaEtl);
+                        } else if (brokerType === "RabbitMq") {
+                            return getUrlFromProvider(appUrl.forEditRabbitMqEtl);
+                        } else {
+                            return null;
+                        }
+                    }
+                    case "QueueSink": {
+                        if (brokerType === "Kafka") {
+                            return getUrlFromProvider(appUrl.forEditKafkaSink);
+                        } else if (brokerType === "RabbitMq") {
+                            return getUrlFromProvider(appUrl.forEditRabbitMqSink);
+                        } else {
+                            return null;
+                        }
+                    }
+                    default:
+                        assertUnreachable(taskType);
+                }
+            };
+
+            goToUrl(getUrl(), event.ctrlKey);
+        },
+        [activeDatabaseName, appUrl, goToUrl]
+    );
+
+    const goToReplication = useCallback(
+        (
+            replicationMode: Raven.Client.Documents.Operations.Replication.PullReplicationMode,
+            id: number,
+            event: React.MouseEvent<HTMLElement, MouseEvent>
+        ) => {
+            let url = null;
+
+            if (replicationMode === "HubToSink") {
+                url = appUrl.forEditReplicationHub(activeDatabaseName, id);
+            }
+            if (replicationMode === "SinkToHub") {
+                url = appUrl.forEditReplicationSink(activeDatabaseName, id);
+            }
+
+            goToUrl(url, event.ctrlKey);
+        },
+        [activeDatabaseName, appUrl, goToUrl]
+    );
+
     const handleOmniSearch = () => {
         const searchResults = omniSearch.search(searchQuery);
+        const resultTypes = new Set(searchResults.items.map((x) => x.item.type));
 
-        // console.log("kalczur searchResults", searchResults);
+        const newResult = { ...emptyResult };
 
-        const groups = _.uniq(searchResults.items.map((x) => x.item.type));
+        for (const resultType of resultTypes) {
+            const resultsByType = searchResults.items.filter((x) => x.item.type === resultType);
 
-        const newResults: Record<SearchItemType, SearchResultItem[]> = {
-            serverMenuItem: [],
-            databaseMenuItem: [],
-            collection: [],
-            index: [],
-            document: [],
-            recentDocument: [],
-            database: [],
-        };
+            const items = resultsByType.map((x) => ({
+                ...x.item,
+                indices: x.indices,
+                innerActionText: x.innerActionText,
+                innerActionIndices: x.innerActionIndices,
+            }));
 
-        groups.forEach((group) => {
-            const resultsByType: SearchResultItem[] = searchResults.items
-                .filter((x) => x.item.type === group)
-                .map((x) => ({
-                    ...x.item,
-                    indices: x.indices,
-                    innerActionText: x.innerActionText,
-                    innerActionIndices: x.innerActionIndices,
-                }));
-            newResults[group] = resultsByType;
-        });
-        setResults(newResults);
+            switch (resultType) {
+                case "document":
+                case "documentsMenuItem":
+                    newResult.database.documents = items;
+                    break;
+                case "collection":
+                    newResult.database.collections = items;
+                    break;
+                case "index":
+                case "indexesMenuItem":
+                    newResult.database.indexes = items;
+                    break;
+                case "task":
+                case "tasksMenuItem":
+                    newResult.database.tasks = items;
+                    break;
+                case "settingsMenuItem":
+                    newResult.database.settings = items;
+                    break;
+                case "statsMenuItem":
+                    newResult.database.stats = items;
+                    break;
+                case "serverMenuItem":
+                    newResult.server = items;
+                    break;
+                case "database":
+                    newResult.switchToDatabase = items;
+                    break;
+                default:
+                    assertUnreachable(resultType);
+            }
+        }
+
+        setResults(newResult);
     };
 
     useEffect(() => {
@@ -194,8 +387,9 @@ export default function StudioSearch() {
         omniSearch.register(
             "collection",
             collections.map((collection) => ({
+                id: _.uniqueId("collection-"),
                 type: "collection",
-                icon: "icon-documents",
+                icon: "documents",
                 onSelected: (e) => goToCollection(collection.name, e),
                 text: collection.name,
             }))
@@ -207,8 +401,9 @@ export default function StudioSearch() {
         omniSearch.register(
             "database",
             allDatabaseNames.map((databaseName) => ({
+                id: _.uniqueId("database-"),
                 type: "database",
-                icon: "icon-database",
+                icon: "database",
                 onSelected: (e) => {
                     if (e.ctrlKey) {
                         window.open(appUrl.forDocumentsByDatabaseName(null, databaseName));
@@ -236,11 +431,8 @@ export default function StudioSearch() {
 
         menuItems.forEach(crawlMenu);
 
-        console.log("kalczur menuItems", menuItems);
-        console.log("kalczur menuLeafs", menuLeafs);
-
         menuLeafs.forEach((item) => {
-            if (!item.alias) {
+            if (ko.unwrap(item.nav) && !item.alias) {
                 const canHandle = item.requiredAccess
                     ? accessManager.canHandleOperation(item.requiredAccess, activeDatabaseName)
                     : true;
@@ -250,15 +442,36 @@ export default function StudioSearch() {
                     const isDatabaseRoute = getIsDatabaseRoute(firstRoute);
 
                     if (isDatabaseRoute && !activeDatabaseName) {
-                        // skip this item
                         return;
                     }
 
+                    let type: SearchItemType = "serverMenuItem";
+
+                    if (isDatabaseRoute) {
+                        if (firstRoute.startsWith("databases/tasks")) {
+                            type = "tasksMenuItem";
+                        }
+                        if (firstRoute.startsWith("databases/indexes")) {
+                            type = "indexesMenuItem";
+                        }
+                        if (firstRoute.startsWith("databases/documents")) {
+                            type = "documentsMenuItem";
+                        }
+                        if (firstRoute.startsWith("databases/settings")) {
+                            type = "settingsMenuItem";
+                        }
+                        if (firstRoute.startsWith("databases/stats")) {
+                            type = "statsMenuItem";
+                        }
+                    }
+
                     searchItems.push({
-                        type: isDatabaseRoute ? "databaseMenuItem" : "serverMenuItem",
+                        id: _.uniqueId("menu-item-"),
+                        type,
                         text: item.title,
+                        route: firstRoute,
                         alternativeTexts: item.search?.alternativeTitles ?? [],
-                        icon: item.css,
+                        icon: item.css.replace("icon-", "") as IconName,
                         onSelected: (e) => goToMenuItem(item, e),
                         innerActions: (item.search?.innerActions ?? []).map((x) => ({
                             text: x.name,
@@ -278,120 +491,93 @@ export default function StudioSearch() {
         });
     }, [menuItems]);
 
-    const hasServerItemsMatch = results.serverMenuItem.length > 0;
-    const hasDatabaseItemsMatch = Object.keys(results)
-        .filter((x: SearchItemType) => x !== "serverMenuItem")
-        .some((x: SearchItemType) => results[x].length > 0);
+    const hasServerMatch = results.server.length > 0;
+    const hasSwitchToDatabaseMatch = results.switchToDatabase.length > 0;
+    const hasDatabaseMatch = Object.keys(results.database).some(
+        (groupType: SearchResultDatabaseGroup) => results.database[groupType].length > 0
+    );
 
     return (
-        <>
-            <Dropdown isOpen={isSearchDropdownOpen} toggle={toggleIsSearchDropdownOpen}>
-                <DropdownToggle className="d-flex flex-grow-1 p-0">
-                    <Input
-                        innerRef={inputRef}
-                        type="search"
-                        placeholder="Search"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-grow-1"
-                    />
-                </DropdownToggle>
-                <DropdownMenu className="studio-search-menu">
-                    <Row>
-                        {hasDatabaseItemsMatch && (
-                            <Col md={hasServerItemsMatch ? 8 : 12}>
-                                <DropdownItem header>Active database</DropdownItem>
-                                {Object.keys(results)
-                                    .filter((x: SearchItemType) => x !== "serverMenuItem")
-                                    .map((groupType: SearchItemType) => {
-                                        const items = results[groupType];
-                                        if (items.length === 0) {
-                                            return null;
-                                        }
+        <Dropdown isOpen={isSearchDropdownOpen} toggle={toggleIsSearchDropdownOpen}>
+            <DropdownToggle className="d-flex flex-grow-1 p-0">
+                <Input
+                    innerRef={inputRef}
+                    type="search"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-grow-1"
+                />
+            </DropdownToggle>
+            <DropdownMenu className="studio-search-menu">
+                <Row>
+                    <Col md={hasServerMatch ? 8 : 12}>
+                        <DropdownItem header>Active database</DropdownItem>
+                        {hasDatabaseMatch ? (
+                            Object.keys(results.database).map((groupType: SearchResultDatabaseGroup) => {
+                                const items = results.database[groupType];
+                                if (items.length === 0) {
+                                    return null;
+                                }
 
-                                        return (
-                                            <React.Fragment key={groupType}>
-                                                <DropdownItem header>
-                                                    <GroupHeader groupType={groupType} />
-                                                </DropdownItem>
-                                                {items.map((x, idx) => (
-                                                    <DropdownItem key={idx} onClick={x.onSelected}>
-                                                        <i className={classNames("me-1", x.icon)} />
-                                                        <FuzzyHighlightedText text={x.text} indices={x.indices} />
-                                                        {x.innerActionText && (
-                                                            <span className="small-label m-0">
-                                                                <Icon icon="arrow-thin-right" margin="mx-1" />
-                                                                <FuzzyHighlightedText
-                                                                    text={x.innerActionText}
-                                                                    indices={x.innerActionIndices}
-                                                                />
-                                                            </span>
-                                                        )}
-                                                    </DropdownItem>
-                                                ))}
-                                                <DropdownItem divider />
-                                            </React.Fragment>
-                                        );
-                                    })}
-                            </Col>
+                                return (
+                                    <React.Fragment key={groupType}>
+                                        <DropdownItem header>{groupType}</DropdownItem>
+                                        {items.map((item) => (
+                                            <ResultItem key={item.id} item={item} />
+                                        ))}
+                                        <DropdownItem divider />
+                                    </React.Fragment>
+                                );
+                            })
+                        ) : (
+                            <DropdownItem disabled>
+                                <EmptySet>No results found</EmptySet>
+                            </DropdownItem>
                         )}
-                        {hasServerItemsMatch && (
-                            <Col md={hasDatabaseItemsMatch ? 4 : 12}>
-                                <DropdownItem header>
-                                    <GroupHeader groupType="serverMenuItem" />
-                                </DropdownItem>
-                                {results.serverMenuItem.map((x, idx) => (
-                                    <DropdownItem key={idx} onClick={x.onSelected}>
-                                        <i className={classNames("me-1", x.icon)} />
-                                        <FuzzyHighlightedText text={x.text} indices={x.indices} />
-                                        {x.innerActionText && (
-                                            <span className="small-label m-0">
-                                                <Icon icon="arrow-thin-right" margin="mx-1" />
-                                                <FuzzyHighlightedText
-                                                    text={x.innerActionText}
-                                                    indices={x.innerActionIndices}
-                                                />
-                                            </span>
-                                        )}
-                                    </DropdownItem>
+
+                        {hasSwitchToDatabaseMatch && (
+                            <>
+                                <DropdownItem header>Switch to database</DropdownItem>
+                                {results.switchToDatabase.map((item) => (
+                                    <ResultItem key={item.id} item={item} />
                                 ))}
-                            </Col>
+                            </>
                         )}
-                    </Row>
-                </DropdownMenu>
-            </Dropdown>
-        </>
+                    </Col>
+
+                    {hasServerMatch && (
+                        <Col md={4}>
+                            <DropdownItem header>Server</DropdownItem>
+                            {results.server.map((item) => (
+                                <ResultItem key={item.id} item={item} />
+                            ))}
+                        </Col>
+                    )}
+                </Row>
+            </DropdownMenu>
+        </Dropdown>
     );
 }
+
+const emptyResult: SearchResult = {
+    server: [],
+    database: {
+        collections: [],
+        documents: [],
+        indexes: [],
+        tasks: [],
+        settings: [],
+        stats: [],
+    },
+    switchToDatabase: [],
+};
 
 function getIsDatabaseRoute(route: string): boolean {
     if (route === "databases") {
         return false;
     }
     return route.startsWith("databases");
-}
-
-function GroupHeader({ groupType }: { groupType: SearchItemType }) {
-    // TODO add icon with color?
-
-    switch (groupType) {
-        case "document":
-            return <div>Documents</div>;
-        case "collection":
-            return <div>Collections</div>;
-        case "index":
-            return <div>Indexes</div>;
-        case "serverMenuItem":
-            return <div>Server</div>;
-        case "databaseMenuItem":
-            return <div>Current Database</div>;
-        case "recentDocument":
-            return <div>Recent Documents</div>;
-        case "database":
-            return <div>Switch Active Database</div>;
-        default:
-            assertUnreachable(groupType);
-    }
 }
 
 const FuzzyHighlightedText = ({ text, indices }: { text: string; indices: readonly RangeTuple[] }) => {
@@ -428,4 +614,27 @@ function getFlatFlatMatchedIndexes(indices: readonly RangeTuple[] | undefined) {
     });
 
     return result;
+}
+
+interface ResultItemProps {
+    item: SearchResultItem;
+}
+
+function ResultItem({ item }: ResultItemProps) {
+    return (
+        <DropdownItem onClick={item.onSelected} className="d-flex align-items-center">
+            <Icon icon={item.icon} />
+            <div className="lh-1">
+                {item.innerActionText ? (
+                    <>
+                        <FuzzyHighlightedText text={item.innerActionText} indices={item.innerActionIndices} />
+                        <br />
+                        <span className="fs-6 fw-lighter text-capitalize">{item.route}</span>
+                    </>
+                ) : (
+                    <FuzzyHighlightedText text={item.text} indices={item.indices} />
+                )}
+            </div>
+        </DropdownItem>
+    );
 }

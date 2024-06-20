@@ -76,11 +76,9 @@ function getSettingsMenuItem(appUrls: computedAppUrls) {
         new leafMenuItem({
             route: 'databases/settings/studioConfiguration',
             search: {
-                alternativeTitles: ["testing"], //TODO:
                 innerActions: [
                     {
                         name: "Database Environment",
-                        alternativeNames: ["baca", "ml054"]// TODO:
                     },
                     {
                         name: "Storage Environment",
