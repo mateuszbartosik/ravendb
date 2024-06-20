@@ -62,6 +62,7 @@ import { accessManagerActions } from "components/common/shell/accessManagerSlice
 import UpgradeModal from "./shell/UpgradeModal";
 import getStudioBootstrapCommand from "commands/resources/getStudioBootstrapCommand";
 import serverSettings from "common/settings/serverSettings";
+import StudioSearchWithDatabaseSelector from "components/shell/studioSearchWithDatabaseSelector/StudioSearchWithDatabaseSelector";
 
 class shell extends viewModelBase {
 
@@ -131,6 +132,8 @@ class shell extends viewModelBase {
 
     upgradeModalView: ReactInKnockout<typeof UpgradeModal>;
     isUpgradeModalVisible = ko.observable<boolean>(false);
+
+    studioSearchWithDatabaseSelectorView: ReactInKnockout<typeof StudioSearchWithDatabaseSelector>;
     
     constructor() {
         super();
@@ -223,6 +226,7 @@ class shell extends viewModelBase {
         this.bindToCurrentInstance("toggleMenu");
 
         this.upgradeModalView = ko.pureComputed(() => ({ component: UpgradeModal }))
+        this.studioSearchWithDatabaseSelectorView = ko.pureComputed(() => ({ component: StudioSearchWithDatabaseSelector }));
     }
     
     // Override canActivate: we can always load this page, regardless of any system db prompt.

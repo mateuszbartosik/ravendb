@@ -14,14 +14,15 @@ function getDatabasesMenuItem(appUrls: computedAppUrls) {
         route: "databases",
         title: "Databases",
         search: {
+            alternativeTitles: ["or1", "or2", "or3"],
             innerActions: [
                 {
                     name: "New Database",
-                    alternativeNames: ["Create Database", "second", "third"] //TODO:
+                    alternativeNames: ["or", "second", "third"] //TODO:
                 },
                 {
                     name: "fruits",
-                    alternativeNames: ["apple", "banana"] //TODO:
+                    alternativeNames: ["or", "or2"] //TODO:
                 }
             ],
         },

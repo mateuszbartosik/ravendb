@@ -1,0 +1,666 @@
+.studio-search-menu {
+    width: 100%;
+
+    .icon-resources::before {
+        color: #7bd85d;
+    }
+    .icon-addon-resources::after {
+        color: #7bd85d;
+    }
+    .icon-documents::before,
+    .inputs-container .icon-documents::before {
+        color: #2f9ef3;
+    }
+    .icon-addon-documents::after,
+    .inputs-container .icon-addon-documents::after {
+        color: #2f9ef3;
+    }
+    .icon-indexing::before,
+    .inputs-container .icon-indexing::before {
+        color: #945ab5;
+    }
+    .icon-addon-indexing::after,
+    .inputs-container .icon-addon-indexing::after {
+        color: #945ab5;
+    }
+    .icon-tasks-menu::before,
+    .inputs-container .icon-tasks-menu::before {
+        color: #f06582;
+    }
+    .icon-addon-tasks-menu::after,
+    .inputs-container .icon-addon-tasks-menu::after {
+        color: #f06582;
+    }
+    .icon-settings::before,
+    .inputs-container .icon-settings::before {
+        color: #f0b362;
+    }
+    .icon-addon-settings::after,
+    .inputs-container .icon-addon-settings::after {
+        color: #f0b362;
+    }
+    .icon-stats-menu::before,
+    .inputs-container .icon-stats-menu::before {
+        color: #7bd85d;
+    }
+    .icon-addon-stats-menu::after,
+    .inputs-container .icon-addon-stats-menu::after {
+        color: #7bd85d;
+    }
+    .icon-resources::before,
+    .inputs-container .icon-resources::before {
+        color: #5186ee;
+    }
+    .icon-addon-resources::after,
+    .inputs-container .icon-addon-resources::after {
+        color: #5186ee;
+    }
+    .icon-cluster-dashboard::before,
+    .inputs-container .icon-cluster-dashboard::before {
+        color: #7069ee;
+    }
+    .icon-addon-cluster-dashboard::after,
+    .inputs-container .icon-addon-cluster-dashboard::after {
+        color: #7069ee;
+    }
+    .icon-manage-server::before,
+    .inputs-container .icon-manage-server::before {
+        color: #8361d4;
+    }
+    .icon-addon-manage-server::after,
+    .inputs-container .icon-addon-manage-server::after {
+        color: #8361d4;
+    }
+    .icon-info::before,
+    .inputs-container .icon-info::before {
+        color: #945ab5;
+    }
+    .icon-addon-info::after,
+    .inputs-container .icon-addon-info::after {
+        color: #945ab5;
+    }
+    .icon-recent::before,
+    .inputs-container .icon-recent::before {
+        color: #5186ee;
+    }
+    .icon-addon-recent::after,
+    .inputs-container .icon-addon-recent::after {
+        color: #5186ee;
+    }
+    .icon-revisions-bin::before,
+    .inputs-container .icon-revisions-bin::before {
+        color: #7069ee;
+    }
+    .icon-addon-revisions-bin::after,
+    .inputs-container .icon-addon-revisions-bin::after {
+        color: #7069ee;
+    }
+    .icon-patch::before,
+    .inputs-container .icon-patch::before {
+        color: #8361d4;
+    }
+    .icon-addon-patch::after,
+    .inputs-container .icon-addon-patch::after {
+        color: #8361d4;
+    }
+    .icon-documents-query::before,
+    .inputs-container .icon-documents-query::before {
+        color: #945ab5;
+    }
+    .icon-addon-documents-query::after,
+    .inputs-container .icon-addon-documents-query::after {
+        color: #945ab5;
+    }
+    .icon-identities::before,
+    .inputs-container .icon-identities::before {
+        color: #bf569f;
+    }
+    .icon-addon-identities::after,
+    .inputs-container .icon-addon-identities::after {
+        color: #bf569f;
+    }
+    .icon-cmp-xchg::before,
+    .inputs-container .icon-cmp-xchg::before {
+        color: #d85b9a;
+    }
+    .icon-addon-cmp-xchg::after,
+    .inputs-container .icon-addon-cmp-xchg::after {
+        color: #d85b9a;
+    }
+    .icon-conflicts::before,
+    .inputs-container .icon-conflicts::before {
+        color: #ed558c;
+    }
+    .icon-addon-conflicts::after,
+    .inputs-container .icon-addon-conflicts::after {
+        color: #ed558c;
+    }
+    .icon-indexes-query::before,
+    .inputs-container .icon-indexes-query::before {
+        color: #945ab5;
+    }
+    .icon-addon-indexes-query::after,
+    .inputs-container .icon-addon-indexes-query::after {
+        color: #945ab5;
+    }
+    .icon-list-of-indexes::before,
+    .inputs-container .icon-list-of-indexes::before {
+        color: #bf569f;
+    }
+    .icon-addon-list-of-indexes::after,
+    .inputs-container .icon-addon-list-of-indexes::after {
+        color: #bf569f;
+    }
+    .icon-indexing-performance::before,
+    .inputs-container .icon-indexing-performance::before {
+        color: #d85b9a;
+    }
+    .icon-addon-indexing-performance::after,
+    .inputs-container .icon-addon-indexing-performance::after {
+        color: #d85b9a;
+    }
+    .icon-index-batch-size::before,
+    .inputs-container .icon-index-batch-size::before {
+        color: #ed558c;
+    }
+    .icon-addon-index-batch-size::after,
+    .inputs-container .icon-addon-index-batch-size::after {
+        color: #ed558c;
+    }
+    .icon-map-reduce-visualizer::before,
+    .inputs-container .icon-map-reduce-visualizer::before {
+        color: #f06582;
+    }
+    .icon-addon-map-reduce-visualizer::after,
+    .inputs-container .icon-addon-map-reduce-visualizer::after {
+        color: #f06582;
+    }
+    .icon-index-cleanup::before,
+    .inputs-container .icon-index-cleanup::before {
+        color: #f3766e;
+    }
+    .icon-addon-index-cleanup::after,
+    .inputs-container .icon-addon-index-cleanup::after {
+        color: #f3766e;
+    }
+    .icon-index-errors::before,
+    .inputs-container .icon-index-errors::before {
+        color: #f38a66;
+    }
+    .icon-addon-index-errors::after,
+    .inputs-container .icon-addon-index-errors::after {
+        color: #f38a66;
+    }
+    .icon-backups::before,
+    .inputs-container .icon-backups::before {
+        color: #f3766e;
+    }
+    .icon-addon-backups::after,
+    .inputs-container .icon-addon-backups::after {
+        color: #f3766e;
+    }
+    .icon-manage-ongoing-tasks::before,
+    .inputs-container .icon-manage-ongoing-tasks::before {
+        color: #f38a66;
+    }
+    .icon-addon-manage-ongoing-tasks::after,
+    .inputs-container .icon-addon-manage-ongoing-tasks::after {
+        color: #f38a66;
+    }
+    .icon-import-database::before,
+    .inputs-container .icon-import-database::before {
+        color: #eea361;
+    }
+    .icon-addon-import-database::after,
+    .inputs-container .icon-addon-import-database::after {
+        color: #eea361;
+    }
+    .icon-export-database::before,
+    .inputs-container .icon-export-database::before {
+        color: #f0b362;
+    }
+    .icon-addon-export-database::after,
+    .inputs-container .icon-addon-export-database::after {
+        color: #f0b362;
+    }
+    .icon-create-sample-data::before,
+    .inputs-container .icon-create-sample-data::before {
+        color: #f0c254;
+    }
+    .icon-addon-create-sample-data::after,
+    .inputs-container .icon-addon-create-sample-data::after {
+        color: #f0c254;
+    }
+    .icon-database-settings::before,
+    .inputs-container .icon-database-settings::before {
+        color: #f0c254;
+    }
+    .icon-addon-database-settings::after,
+    .inputs-container .icon-addon-database-settings::after {
+        color: #f0c254;
+    }
+    .icon-manage-connection-strings::before,
+    .inputs-container .icon-manage-connection-strings::before {
+        color: #edcd51;
+    }
+    .icon-addon-manage-connection-strings::after,
+    .inputs-container .icon-addon-manage-connection-strings::after {
+        color: #edcd51;
+    }
+    .icon-conflicts-resolution::before,
+    .inputs-container .icon-conflicts-resolution::before {
+        color: #c4d451;
+    }
+    .icon-addon-conflicts-resolution::after,
+    .inputs-container .icon-addon-conflicts-resolution::after {
+        color: #c4d451;
+    }
+    .icon-database-client-configuration::before,
+    .inputs-container .icon-database-client-configuration::before {
+        color: #7bd85d;
+    }
+    .icon-addon-database-client-configuration::after,
+    .inputs-container .icon-addon-database-client-configuration::after {
+        color: #7bd85d;
+    }
+    .icon-database-studio-configuration::before,
+    .inputs-container .icon-database-studio-configuration::before {
+        color: #51d27a;
+    }
+    .icon-addon-database-studio-configuration::after,
+    .inputs-container .icon-addon-database-studio-configuration::after {
+        color: #51d27a;
+    }
+    .icon-revisions::before,
+    .inputs-container .icon-revisions::before {
+        color: #37c4ac;
+    }
+    .icon-addon-revisions::after,
+    .inputs-container .icon-addon-revisions::after {
+        color: #37c4ac;
+    }
+    .icon-expos-refresh::before,
+    .inputs-container .icon-expos-refresh::before {
+        color: #2fb7d2;
+    }
+    .icon-addon-expos-refresh::after,
+    .inputs-container .icon-addon-expos-refresh::after {
+        color: #2fb7d2;
+    }
+    .icon-document-expiration::before,
+    .inputs-container .icon-document-expiration::before {
+        color: #2f9ef3;
+    }
+    .icon-addon-document-expiration::after,
+    .inputs-container .icon-addon-document-expiration::after {
+        color: #2f9ef3;
+    }
+    .icon-documents-compression::before,
+    .inputs-container .icon-documents-compression::before {
+        color: #5186ee;
+    }
+    .icon-addon-documents-compression::after,
+    .inputs-container .icon-addon-documents-compression::after {
+        color: #5186ee;
+    }
+    .icon-data-archival::before,
+    .inputs-container .icon-data-archival::before {
+        color: #7069ee;
+    }
+    .icon-addon-data-archival::after,
+    .inputs-container .icon-addon-data-archival::after {
+        color: #7069ee;
+    }
+    .icon-timeseries-settings::before,
+    .inputs-container .icon-timeseries-settings::before {
+        color: #8361d4;
+    }
+    .icon-addon-timeseries-settings::after,
+    .inputs-container .icon-addon-timeseries-settings::after {
+        color: #8361d4;
+    }
+    .icon-custom-sorters::before,
+    .inputs-container .icon-custom-sorters::before {
+        color: #945ab5;
+    }
+    .icon-addon-custom-sorters::after,
+    .inputs-container .icon-addon-custom-sorters::after {
+        color: #945ab5;
+    }
+    .icon-custom-analyzers::before,
+    .inputs-container .icon-custom-analyzers::before {
+        color: #bf569f;
+    }
+    .icon-addon-custom-analyzers::after,
+    .inputs-container .icon-addon-custom-analyzers::after {
+        color: #bf569f;
+    }
+    .icon-integrations::before,
+    .inputs-container .icon-integrations::before {
+        color: #d85b9a;
+    }
+    .icon-addon-integrations::after,
+    .inputs-container .icon-addon-integrations::after {
+        color: #d85b9a;
+    }
+    .icon-manage-dbgroup::before,
+    .inputs-container .icon-manage-dbgroup::before {
+        color: #ed558c;
+    }
+    .icon-addon-manage-dbgroup::after,
+    .inputs-container .icon-addon-manage-dbgroup::after {
+        color: #ed558c;
+    }
+    .icon-database-record::before,
+    .inputs-container .icon-database-record::before {
+        color: #f06582;
+    }
+    .icon-addon-database-record::after,
+    .inputs-container .icon-addon-database-record::after {
+        color: #f06582;
+    }
+    .icon-database-id::before,
+    .inputs-container .icon-database-id::before {
+        color: #f3766e;
+    }
+    .icon-addon-database-id::after,
+    .inputs-container .icon-addon-database-id::after {
+        color: #f3766e;
+    }
+    .icon-stats::before,
+    .inputs-container .icon-stats::before {
+        color: #51d27a;
+    }
+    .icon-addon-stats::after,
+    .inputs-container .icon-addon-stats::after {
+        color: #51d27a;
+    }
+    .icon-io-test::before,
+    .inputs-container .icon-io-test::before {
+        color: #37c4ac;
+    }
+    .icon-addon-io-test::after,
+    .inputs-container .icon-addon-io-test::after {
+        color: #37c4ac;
+    }
+    .icon-storage::before,
+    .inputs-container .icon-storage::before {
+        color: #2fb7d2;
+    }
+    .icon-addon-storage::after,
+    .inputs-container .icon-addon-storage::after {
+        color: #2fb7d2;
+    }
+    .icon-stats-running-queries::before,
+    .inputs-container .icon-stats-running-queries::before {
+        color: #2f9ef3;
+    }
+    .icon-addon-stats-running-queries::after,
+    .inputs-container .icon-addon-stats-running-queries::after {
+        color: #2f9ef3;
+    }
+    .icon-replication-stats::before,
+    .inputs-container .icon-replication-stats::before {
+        color: #5186ee;
+    }
+    .icon-addon-replication-stats::after,
+    .inputs-container .icon-addon-replication-stats::after {
+        color: #5186ee;
+    }
+    .icon-cluster::before,
+    .inputs-container .icon-cluster::before {
+        color: #bf569f;
+    }
+    .icon-addon-cluster::after,
+    .inputs-container .icon-addon-cluster::after {
+        color: #bf569f;
+    }
+    .icon-client-configuration::before,
+    .inputs-container .icon-client-configuration::before {
+        color: #d85b9a;
+    }
+    .icon-addon-client-configuration::after,
+    .inputs-container .icon-addon-client-configuration::after {
+        color: #d85b9a;
+    }
+    .icon-studio-configuration::before,
+    .inputs-container .icon-studio-configuration::before {
+        color: #ed558c;
+    }
+    .icon-addon-studio-configuration::after,
+    .inputs-container .icon-addon-studio-configuration::after {
+        color: #ed558c;
+    }
+    .icon-server-settings::before,
+    .inputs-container .icon-server-settings::before {
+        color: #f06582;
+    }
+    .icon-addon-server-settings::after,
+    .inputs-container .icon-addon-server-settings::after {
+        color: #f06582;
+    }
+    .icon-administrator-js-console::before,
+    .inputs-container .icon-administrator-js-console::before {
+        color: #f3766e;
+    }
+    .icon-addon-administrator-js-console::after,
+    .inputs-container .icon-addon-administrator-js-console::after {
+        color: #f3766e;
+    }
+    .icon-certificate::before,
+    .inputs-container .icon-certificate::before {
+        color: #f38a66;
+    }
+    .icon-addon-certificate::after,
+    .inputs-container .icon-addon-certificate::after {
+        color: #f38a66;
+    }
+    .icon-server-wide-tasks::before,
+    .inputs-container .icon-server-wide-tasks::before {
+        color: #eea361;
+    }
+    .icon-addon-server-wide-tasks::after,
+    .inputs-container .icon-addon-server-wide-tasks::after {
+        color: #eea361;
+    }
+    .icon-server-wide-custom-analyzers::before,
+    .inputs-container .icon-server-wide-custom-analyzers::before {
+        color: #f0b362;
+    }
+    .icon-addon-server-wide-custom-analyzers::after,
+    .inputs-container .icon-addon-server-wide-custom-analyzers::after {
+        color: #f0b362;
+    }
+    .icon-server-wide-custom-sorters::before,
+    .inputs-container .icon-server-wide-custom-sorters::before {
+        color: #f0c254;
+    }
+    .icon-addon-server-wide-custom-sorters::after,
+    .inputs-container .icon-addon-server-wide-custom-sorters::after {
+        color: #f0c254;
+    }
+    .icon-admin-logs::before,
+    .inputs-container .icon-admin-logs::before {
+        color: #edcd51;
+    }
+    .icon-addon-admin-logs::after,
+    .inputs-container .icon-addon-admin-logs::after {
+        color: #edcd51;
+    }
+    .icon-traffic-watch::before,
+    .inputs-container .icon-traffic-watch::before {
+        color: #c4d451;
+    }
+    .icon-addon-traffic-watch::after,
+    .inputs-container .icon-addon-traffic-watch::after {
+        color: #c4d451;
+    }
+    .icon-gather-debug-information::before,
+    .inputs-container .icon-gather-debug-information::before {
+        color: #7bd85d;
+    }
+    .icon-addon-gather-debug-information::after,
+    .inputs-container .icon-addon-gather-debug-information::after {
+        color: #7bd85d;
+    }
+    .icon-system-storage::before,
+    .inputs-container .icon-system-storage::before {
+        color: #51d27a;
+    }
+    .icon-addon-system-storage::after,
+    .inputs-container .icon-addon-system-storage::after {
+        color: #51d27a;
+    }
+    .icon-manage-server-io-test::before,
+    .inputs-container .icon-manage-server-io-test::before {
+        color: #37c4ac;
+    }
+    .icon-addon-manage-server-io-test::after,
+    .inputs-container .icon-addon-manage-server-io-test::after {
+        color: #37c4ac;
+    }
+    .icon-stack-traces::before,
+    .inputs-container .icon-stack-traces::before {
+        color: #2fb7d2;
+    }
+    .icon-addon-stack-traces::after,
+    .inputs-container .icon-addon-stack-traces::after {
+        color: #2fb7d2;
+    }
+    .icon-manage-server-running-queries::before,
+    .inputs-container .icon-manage-server-running-queries::before {
+        color: #2f9ef3;
+    }
+    .icon-addon-manage-server-running-queries::after,
+    .inputs-container .icon-addon-manage-server-running-queries::after {
+        color: #2f9ef3;
+    }
+    .icon-debug-advanced::before,
+    .inputs-container .icon-debug-advanced::before {
+        color: #5186ee;
+    }
+    .icon-addon-debug-advanced::after,
+    .inputs-container .icon-addon-debug-advanced::after {
+        color: #5186ee;
+    }
+    .icon-system::before,
+    .inputs-container .icon-system::before {
+        color: #3c6fb4;
+    }
+    .icon-addon-system::after,
+    .inputs-container .icon-addon-system::after {
+        color: #3c6fb4;
+    }
+    .icon-plus::before,
+    .inputs-container .icon-plus::before {
+        color: #b0d47d;
+    }
+    .icon-addon-plus::after,
+    .inputs-container .icon-addon-plus::after {
+        color: #b0d47d;
+    }
+    .icon-list::before,
+    .inputs-container .icon-list::before {
+        color: #ef5450;
+    }
+    .icon-addon-list::after,
+    .inputs-container .icon-addon-list::after {
+        color: #ef5450;
+    }
+    .icon-index-stats::before,
+    .inputs-container .icon-index-stats::before {
+        color: #5c6bc0;
+    }
+    .icon-addon-index-stats::after,
+    .inputs-container .icon-addon-index-stats::after {
+        color: #5c6bc0;
+    }
+    .icon-etl::before,
+    .inputs-container .icon-etl::before {
+        color: #ff346f;
+    }
+    .icon-addon-etl::after,
+    .inputs-container .icon-addon-etl::after {
+        color: #ff346f;
+    }
+    .icon-new::before,
+    .inputs-container .icon-new::before {
+        color: #d9e021;
+    }
+    .icon-addon-new::after,
+    .inputs-container .icon-addon-new::after {
+        color: #d9e021;
+    }
+    .icon-tasks::before,
+    .inputs-container .icon-tasks::before {
+        color: #fbb03b;
+    }
+    .icon-addon-tasks::after,
+    .inputs-container .icon-addon-tasks::after {
+        color: #fbb03b;
+    }
+    .icon-license::before,
+    .inputs-container .icon-license::before {
+        color: #e9eaea;
+    }
+    .icon-addon-license::after,
+    .inputs-container .icon-addon-license::after {
+        color: #e9eaea;
+    }
+    .icon-database::before,
+    .inputs-container .icon-database::before {
+        color: #884ca9;
+    }
+    .icon-addon-database::after,
+    .inputs-container .icon-addon-database::after {
+        color: #884ca9;
+    }
+    .icon-replication::before,
+    .inputs-container .icon-replication::before {
+        color: #9c28b1;
+    }
+    .icon-addon-replication::after,
+    .inputs-container .icon-addon-replication::after {
+        color: #9c28b1;
+    }
+    .icon-sql-replication::before,
+    .inputs-container .icon-sql-replication::before {
+        color: #673bb7;
+    }
+    .icon-addon-sql-replication::after,
+    .inputs-container .icon-addon-sql-replication::after {
+        color: #673bb7;
+    }
+    .icon-topology::before,
+    .inputs-container .icon-topology::before {
+        color: #ff756b;
+    }
+    .icon-addon-topology::after,
+    .inputs-container .icon-addon-topology::after {
+        color: #ff756b;
+    }
+    .icon-custom-functions::before,
+    .inputs-container .icon-custom-functions::before {
+        color: #b881ff;
+    }
+    .icon-addon-custom-functions::after,
+    .inputs-container .icon-addon-custom-functions::after {
+        color: #b881ff;
+    }
+    .icon-periodic-export::before,
+    .inputs-container .icon-periodic-export::before {
+        color: #018390;
+    }
+    .icon-addon-periodic-export::after,
+    .inputs-container .icon-addon-periodic-export::after {
+        color: #018390;
+    }
+    .icon-subscriptions::before,
+    .inputs-container .icon-subscriptions::before {
+        color: #35f9ff;
+    }
+    .icon-addon-subscriptions::after,
+    .inputs-container .icon-addon-subscriptions::after {
+        color: #35f9ff;
+    }
+}

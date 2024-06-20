@@ -137,6 +137,7 @@ class searchBox {
             if (query) {
                 this.spinners.startsWith(true);
                 const searchResults = this.omniSearch.search(query);
+                console.log('kalczur searchResults',searchResults );
                 const groups = _.uniq(searchResults.items.map(x => x.item.type));
                 groups.forEach(group => {
                     const resultsByType: SearchResultItem[] = searchResults
@@ -144,11 +145,12 @@ class searchBox {
                         .filter(x => x.item.type === group)
                         .map(x => ({
                             ...x.item,
-                            subText: x.matchedAlternative
+                            subText: x.innerActionText
                         }));
                     this.results.get(group)(resultsByType);
                 });
                 
+                // TODO copy
                 new getDocumentsMetadataByIDPrefixCommand(query, 10, activeDatabaseTracker.default.database())
                     .execute()
                     .done((results: Array<metadataAwareDto>) => {
