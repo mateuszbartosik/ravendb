@@ -58,7 +58,6 @@ type SearchInnerAction = {
 };
 
 type SearchItem = {
-    id: string;
     type: SearchItemType;
     text: string;
     onSelected: React.MouseEventHandler<HTMLElement>;
@@ -85,7 +84,11 @@ type OngoingTaskWithBroker = Raven.Client.Documents.Operations.OngoingTasks.Ongo
 };
 
 export default function StudioSearch() {
-    const { value: isSearchDropdownOpen, toggle: toggleIsSearchDropdownOpen } = useBoolean(false);
+    const {
+        value: isSearchDropdownOpen,
+        toggle: toggleIsSearchDropdownOpen,
+        setValue: setIsDropdownOpen,
+    } = useBoolean(false);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [results, setResults] = useState<SearchResult>(emptyResult);
@@ -108,7 +111,10 @@ export default function StudioSearch() {
     useAsync(
         async () => {
             if (!activeDatabaseName) {
-                return [];
+                return {
+                    OngoingTasks: [],
+                    PullReplications: [],
+                };
             }
             return tasksService.getOngoingTasks(activeDatabaseName, location);
         },
@@ -116,7 +122,6 @@ export default function StudioSearch() {
         {
             onSuccess(results: Raven.Server.Web.System.OngoingTasksResult) {
                 const ongoingTasks: SearchItem[] = (results.OngoingTasks as OngoingTaskWithBroker[]).map((x) => ({
-                    id: _.uniqueId("task-"),
                     type: "task",
                     icon: "ongoing-tasks",
                     text: x.TaskName,
@@ -124,7 +129,6 @@ export default function StudioSearch() {
                 }));
 
                 const pullReplications: SearchItem[] = results.PullReplications.map((x) => ({
-                    id: _.uniqueId("task-"),
                     type: "task",
                     icon: "replication",
                     text: x.Name,
@@ -149,7 +153,6 @@ export default function StudioSearch() {
                 omniSearch.register(
                     "index",
                     results.map((x) => ({
-                        id: _.uniqueId("index-"),
                         type: "index",
                         icon: "index",
                         text: x.Name,
@@ -177,7 +180,6 @@ export default function StudioSearch() {
                 omniSearch.register(
                     "document",
                     mappedResults.map((result) => ({
-                        id: _.uniqueId("document-"),
                         type: "document",
                         icon: "document",
                         text: result,
@@ -196,8 +198,8 @@ export default function StudioSearch() {
 
     const goToUrl = useCallback(
         (url: string, newTab: boolean) => {
-            toggleIsSearchDropdownOpen();
             setSearchQuery("");
+            toggleIsSearchDropdownOpen();
             if (newTab) {
                 window.open(url, "_blank").focus();
             } else {
@@ -256,28 +258,20 @@ export default function StudioSearch() {
                         return getUrlFromProvider(appUrl.forEditElasticSearchEtl);
                     case "SqlEtl":
                         return getUrlFromProvider(appUrl.forEditSqlEtl);
-
                     case "RavenEtl":
                         return getUrlFromProvider(appUrl.forEditRavenEtl);
-
                     case "Subscription":
                         return getUrlFromProvider(appUrl.forEditSubscription);
-
                     case "Replication":
                         return getUrlFromProvider(appUrl.forEditExternalReplication);
-
                     case "PullReplicationAsSink":
                         return getUrlFromProvider(appUrl.forEditReplicationSink);
-
                     case "PullReplicationAsHub":
                         return getUrlFromProvider(appUrl.forEditReplicationHub);
-
                     case "OlapEtl":
                         return getUrlFromProvider(appUrl.forEditOlapEtl);
-
                     case "Backup":
                         return appUrl.forEditPeriodicBackupTask("Backups", "OngoingTasks", taskId);
-
                     case "QueueEtl": {
                         if (brokerType === "Kafka") {
                             return getUrlFromProvider(appUrl.forEditKafkaEtl);
@@ -330,7 +324,9 @@ export default function StudioSearch() {
         const searchResults = omniSearch.search(searchQuery);
         const resultTypes = new Set(searchResults.items.map((x) => x.item.type));
 
-        const newResult = { ...emptyResult };
+        console.log("kalczur searchResults", searchResults);
+
+        const newResult = JSON.parse(JSON.stringify(emptyResult));
 
         for (const resultType of resultTypes) {
             const resultsByType = searchResults.items.filter((x) => x.item.type === resultType);
@@ -340,6 +336,7 @@ export default function StudioSearch() {
                 indices: x.indices,
                 innerActionText: x.innerActionText,
                 innerActionIndices: x.innerActionIndices,
+                id: _.uniqueId("item-"),
             }));
 
             switch (resultType) {
@@ -387,7 +384,6 @@ export default function StudioSearch() {
         omniSearch.register(
             "collection",
             collections.map((collection) => ({
-                id: _.uniqueId("collection-"),
                 type: "collection",
                 icon: "documents",
                 onSelected: (e) => goToCollection(collection.name, e),
@@ -401,7 +397,6 @@ export default function StudioSearch() {
         omniSearch.register(
             "database",
             allDatabaseNames.map((databaseName) => ({
-                id: _.uniqueId("database-"),
                 type: "database",
                 icon: "database",
                 onSelected: (e) => {
@@ -460,13 +455,12 @@ export default function StudioSearch() {
                         if (firstRoute.startsWith("databases/settings")) {
                             type = "settingsMenuItem";
                         }
-                        if (firstRoute.startsWith("databases/stats")) {
+                        if (firstRoute.startsWith("databases/status")) {
                             type = "statsMenuItem";
                         }
                     }
 
                     searchItems.push({
-                        id: _.uniqueId("menu-item-"),
                         type,
                         text: item.title,
                         route: firstRoute,
@@ -511,8 +505,10 @@ export default function StudioSearch() {
             </DropdownToggle>
             <DropdownMenu className="studio-search-menu">
                 <Row>
-                    <Col md={hasServerMatch ? 8 : 12}>
-                        <DropdownItem header>Active database</DropdownItem>
+                    <Col md={hasServerMatch ? 8 : 12} className="database-column">
+                        <DropdownItem header>
+                            <span className="text-uppercase">Active database</span>
+                        </DropdownItem>
                         {hasDatabaseMatch ? (
                             Object.keys(results.database).map((groupType: SearchResultDatabaseGroup) => {
                                 const items = results.database[groupType];
@@ -521,34 +517,39 @@ export default function StudioSearch() {
                                 }
 
                                 return (
-                                    <React.Fragment key={groupType}>
-                                        <DropdownItem header>{groupType}</DropdownItem>
+                                    <div key={groupType} className="database-group">
+                                        <DropdownItem header>
+                                            <DatabaseGroupHeader groupType={groupType} />
+                                        </DropdownItem>
                                         {items.map((item) => (
                                             <ResultItem key={item.id} item={item} />
                                         ))}
-                                        <DropdownItem divider />
-                                    </React.Fragment>
+                                    </div>
                                 );
                             })
                         ) : (
-                            <DropdownItem disabled>
+                            <DropdownItem disabled className="database-group">
                                 <EmptySet>No results found</EmptySet>
                             </DropdownItem>
                         )}
 
                         {hasSwitchToDatabaseMatch && (
-                            <>
-                                <DropdownItem header>Switch to database</DropdownItem>
+                            <div className="database-group">
+                                <DropdownItem header>
+                                    <span className="text-uppercase">Switch active database</span>
+                                </DropdownItem>
                                 {results.switchToDatabase.map((item) => (
                                     <ResultItem key={item.id} item={item} />
                                 ))}
-                            </>
+                            </div>
                         )}
                     </Col>
 
                     {hasServerMatch && (
-                        <Col md={4}>
-                            <DropdownItem header>Server</DropdownItem>
+                        <Col md={4} className="server-column">
+                            <DropdownItem header>
+                                <span className="text-uppercase">Server</span>
+                            </DropdownItem>
                             {results.server.map((item) => (
                                 <ResultItem key={item.id} item={item} />
                             ))}
@@ -637,4 +638,53 @@ function ResultItem({ item }: ResultItemProps) {
             </div>
         </DropdownItem>
     );
+}
+
+function DatabaseGroupHeader({ groupType }: { groupType: SearchResultDatabaseGroup }) {
+    switch (groupType) {
+        case "collections":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="documents" style={{ color: "#2f9ef3" }} />
+                    Collections
+                </strong>
+            );
+        case "documents":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="document" style={{ color: "#2f9ef3" }} />
+                    Documents
+                </strong>
+            );
+        case "indexes":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="index" style={{ color: "#945ab5" }} />
+                    Indexes
+                </strong>
+            );
+        case "tasks":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="tasks" style={{ color: "#f06582" }} />
+                    Tasks
+                </strong>
+            );
+        case "settings":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="settings" style={{ color: "#f0b362" }} />
+                    Settings
+                </strong>
+            );
+        case "stats":
+            return (
+                <strong className="text-uppercase">
+                    <Icon icon="stats" style={{ color: "#7bd85d" }} />
+                    Stats
+                </strong>
+            );
+        default:
+            assertUnreachable(groupType);
+    }
 }
