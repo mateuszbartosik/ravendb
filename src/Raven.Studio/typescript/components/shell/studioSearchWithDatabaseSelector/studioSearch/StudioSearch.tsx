@@ -23,6 +23,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useAsync } from "react-async-hook";
 import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input, Row } from "reactstrap";
 import IconName from "typings/server/icons";
+import { todo } from "common/developmentHelper";
+
+todo(
+    "Feature",
+    "Damian",
+    "Filter Settings > Advanced section, Manage Database Group, Query, Patching etc. There are some db-related items in Server column"
+);
+todo("Feature", "Damian", "Show sharded database icon for sharded database");
+todo("Feature", "Damian", "Implement keyboard navigation and shortcut for opening omnisearch");
+todo("Feature", "Damian", "Move Server Environment (shell.html) to DatabaseSelector");
+todo("BugFix", "Damian", "After typing Space the dropdown menu won't be visible until you type it again");
 
 type SearchItemType =
     | "serverMenuItem"
@@ -492,71 +503,76 @@ export default function StudioSearch() {
     );
 
     return (
-        <Dropdown isOpen={isSearchDropdownOpen} toggle={toggleIsSearchDropdownOpen}>
-            <DropdownToggle className="d-flex flex-grow-1 p-0">
+        <Dropdown isOpen={isSearchDropdownOpen} toggle={toggleIsSearchDropdownOpen} className="omnisearch">
+            <DropdownToggle className="omnisearch__toggle">
                 <Input
                     innerRef={inputRef}
                     type="search"
-                    placeholder="Search"
+                    placeholder="Type / to search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-grow-1"
+                    className="flex-grow-1 omnisearch__input"
                 />
-            </DropdownToggle>
-            <DropdownMenu className="studio-search-menu">
-                <Row>
-                    <Col md={hasServerMatch ? 8 : 12} className="database-column">
-                        <DropdownItem header>
-                            <span className="text-uppercase">Active database</span>
-                        </DropdownItem>
-                        {hasDatabaseMatch ? (
-                            Object.keys(results.database).map((groupType: SearchResultDatabaseGroup) => {
-                                const items = results.database[groupType];
-                                if (items.length === 0) {
-                                    return null;
-                                }
-
-                                return (
-                                    <div key={groupType} className="database-group">
-                                        <DropdownItem header>
-                                            <DatabaseGroupHeader groupType={groupType} />
-                                        </DropdownItem>
-                                        {items.map((item) => (
-                                            <ResultItem key={item.id} item={item} />
-                                        ))}
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <DropdownItem disabled className="database-group">
-                                <EmptySet>No results found</EmptySet>
+                <DropdownMenu className="omnisearch-results">
+                    <Row className="m-0">
+                        <Col sm={12} lg={hasServerMatch ? 8 : 12} className="omnisearch__database-col p-0">
+                            <DropdownItem header className="omnisearch__database-col__header--sticky">
+                                <span className="small-label">Active database</span>
                             </DropdownItem>
-                        )}
+                            {hasDatabaseMatch ? (
+                                Object.keys(results.database).map((groupType: SearchResultDatabaseGroup) => {
+                                    const items = results.database[groupType];
+                                    if (items.length === 0) {
+                                        return null;
+                                    }
 
-                        {hasSwitchToDatabaseMatch && (
-                            <div className="database-group">
-                                <DropdownItem header>
-                                    <span className="text-uppercase">Switch active database</span>
+                                    return (
+                                        <div key={groupType} className="omnisearch__database-col__group">
+                                            <DropdownItem header className="omnisearch__database-col__group__header">
+                                                <DatabaseGroupHeader groupType={groupType} />
+                                            </DropdownItem>
+                                            {items.map((item) => (
+                                                <ResultItem key={item.id} item={item} />
+                                            ))}
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <DropdownItem disabled className="omnisearch__database-col__group pt-0">
+                                    <EmptySet compact>No results found</EmptySet>
                                 </DropdownItem>
-                                {results.switchToDatabase.map((item) => (
-                                    <ResultItem key={item.id} item={item} />
-                                ))}
-                            </div>
-                        )}
-                    </Col>
+                            )}
 
-                    {hasServerMatch && (
-                        <Col md={4} className="server-column">
-                            <DropdownItem header>
-                                <span className="text-uppercase">Server</span>
-                            </DropdownItem>
-                            {results.server.map((item) => (
-                                <ResultItem key={item.id} item={item} />
-                            ))}
+                            {hasSwitchToDatabaseMatch && (
+                                <div className="omnisearch__database-col__group omnisearch__switch-database">
+                                    <DropdownItem
+                                        header
+                                        className="omnisearch__database-col__group__header omnisearch__database-col__group__header--sticky"
+                                    >
+                                        <span className="small-label">Switch active database</span>
+                                    </DropdownItem>
+                                    {results.switchToDatabase.map((item) => (
+                                        <ResultItem key={item.id} item={item} />
+                                    ))}
+                                </div>
+                            )}
                         </Col>
-                    )}
-                </Row>
-            </DropdownMenu>
+
+                        {hasServerMatch && (
+                            <Col sm={12} lg={4} className="omnisearch__server-col p-0">
+                                <DropdownItem header className="omnisearch__server-col__header--sticky">
+                                    <span className="small-label">Server</span>
+                                </DropdownItem>
+                                <div className="omnisearch__server-col__group">
+                                    {results.server.map((item) => (
+                                        <ResultItem key={item.id} item={item} />
+                                    ))}
+                                </div>
+                            </Col>
+                        )}
+                    </Row>
+                </DropdownMenu>
+            </DropdownToggle>
         </Dropdown>
     );
 }
@@ -590,7 +606,7 @@ const FuzzyHighlightedText = ({ text, indices }: { text: string; indices: readon
                 const isHighlighted = flatMatchedIndices.includes(index);
                 if (isHighlighted) {
                     return (
-                        <mark key={index} className="p-0">
+                        <mark key={index} className="bg-faded-warning p-0">
                             {char}
                         </mark>
                     );
@@ -623,14 +639,14 @@ interface ResultItemProps {
 
 function ResultItem({ item }: ResultItemProps) {
     return (
-        <DropdownItem onClick={item.onSelected} className="d-flex align-items-center">
+        <DropdownItem onClick={item.onSelected} className="d-flex align-items-center omnisearch__dropdown-item">
             <Icon icon={item.icon} />
             <div className="lh-1">
                 {item.innerActionText ? (
                     <>
                         <FuzzyHighlightedText text={item.innerActionText} indices={item.innerActionIndices} />
                         <br />
-                        <span className="fs-6 fw-lighter text-capitalize">{item.route}</span>
+                        <span className="omnisearch__route">{item.route}</span>
                     </>
                 ) : (
                     <FuzzyHighlightedText text={item.text} indices={item.indices} />
@@ -644,45 +660,45 @@ function DatabaseGroupHeader({ groupType }: { groupType: SearchResultDatabaseGro
     switch (groupType) {
         case "collections":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="documents" style={{ color: "#2f9ef3" }} />
+                <>
+                    <Icon icon="documents" />
                     Collections
-                </strong>
+                </>
             );
         case "documents":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="document" style={{ color: "#2f9ef3" }} />
+                <>
+                    <Icon icon="document" />
                     Documents
-                </strong>
+                </>
             );
         case "indexes":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="index" style={{ color: "#945ab5" }} />
+                <>
+                    <Icon icon="index" />
                     Indexes
-                </strong>
+                </>
             );
         case "tasks":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="tasks" style={{ color: "#f06582" }} />
+                <>
+                    <Icon icon="tasks" />
                     Tasks
-                </strong>
+                </>
             );
         case "settings":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="settings" style={{ color: "#f0b362" }} />
+                <>
+                    <Icon icon="settings" />
                     Settings
-                </strong>
+                </>
             );
         case "stats":
             return (
-                <strong className="text-uppercase">
-                    <Icon icon="stats" style={{ color: "#7bd85d" }} />
+                <>
+                    <Icon icon="stats" />
                     Stats
-                </strong>
+                </>
             );
         default:
             assertUnreachable(groupType);
