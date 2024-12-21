@@ -63,8 +63,21 @@ import { Provider } from "react-redux";
 
 import { resetAllMocks } from "@storybook/test";
 
+const themes = {
+    default: async () => {},
+    classic: () => import("../wwwroot/Content/css/bs5-styles-classic.scss"),
+    blue: () => import("../wwwroot/Content/css/bs5-styles-blue.scss"),
+    light: () => import("../wwwroot/Content/css/bs5-styles-light.scss"),
+};
+
+const switchTheme = async (themeName) => {
+    if (!themes[themeName]) return;
+    await themes[themeName]();
+};
+
 export const decorators = [
-    (Story) => {
+    (Story, context) => {
+        switchTheme(context.globals.theme);
         resetAllMocks();
 
         const [store] = useState(() => {
@@ -72,7 +85,7 @@ export const decorators = [
             setEffectiveTestStore(storeConfiguration);
             return storeConfiguration;
         });
-        
+
         return (
             <Provider store={store}>
                 <div className="h-100">
@@ -83,45 +96,19 @@ export const decorators = [
     }
 ]
 
-export const parameters = {
-  actions: { }, //TODO: it was regexp
-  controls: {
-    matchers: {
-      color: /(background|color)$/i,
-      date: /Date$/,
+export const globalTypes = {
+    theme: {
+        name: "Theme",
+        description: "Global theme for components",
+        defaultValue: "default",
+        toolbar: {
+            icon: "paintbrush",
+            items: [
+                { value: "default", title: "Default" },
+                { value: "classic", title: "Classic" },
+                { value: "blue", title: "Blue" },
+                { value: "light", title: "Light" },
+            ],
+        },
     },
-  },
-  backgrounds: {
-    default: 'default-body',
-    values: [
-      {
-        name: 'default-body',
-        value: '#181826',
-      },
-      {
-        name: 'default-panel',
-        value: '#1e1f2b',
-      },
-      {
-        name: 'default-panel-header',
-        value: '#262936',
-      },
-      {
-        name: 'blue-body',
-        value: '#172138',
-      },
-      {
-        name: 'blue-panel',
-        value: '#e1e3ef',
-      },
-      {
-        name: 'blue-panel-header',
-        value: '#f4f5fb',
-      },
-      {
-        name: 'light-body',
-        value: '#dbdde3',
-      },      
-    ],
-  },
-}
+};
