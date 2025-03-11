@@ -21,6 +21,7 @@ import { FormRangeProps } from "react-bootstrap/FormRange";
 import { InputType } from "../../../typings/_studio/react-bootstrap";
 import useUniqueId from "hooks/useUniqueId";
 import { FormGroupProps } from "react-bootstrap/FormGroup";
+import { MultiRadioToggle } from "./toggles/MultiRadioToggle";
 
 type FormElementProps<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>> = Omit<
     ControllerProps<TFieldValues, TName>,
@@ -63,6 +64,12 @@ type FormRadioToggleWithIconProps<
     TName extends FieldPath<TFieldValues>,
 > = FormElementProps<TFieldValues, TName> &
     Omit<ComponentProps<typeof RadioToggleWithIcon>, "name" | "selectedValue" | "setSelectedValue">;
+
+type FormMultiRadioToggleProps<
+    TFieldValues extends FieldValues,
+    TName extends FieldPath<TFieldValues>,
+> = FormElementProps<TFieldValues, TName> &
+    Omit<ComponentProps<typeof MultiRadioToggle>, "selectedItem" | "setSelectedItem">;
 
 export function FormInput<
     TFieldValues extends FieldValues = FieldValues,
@@ -326,6 +333,38 @@ export function FormRadioToggleWithIcon<TFieldValues extends FieldValues, TName 
                     name={name}
                     selectedValue={value}
                     setSelectedValue={onChange}
+                    disabled={formState.isSubmitting}
+                    {...rest}
+                />
+            </div>
+            {invalid && <FormValidationMessage>{error.message}</FormValidationMessage>}
+        </div>
+    );
+}
+
+export function FormMultiRadioToggle<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>(
+    props: FormMultiRadioToggleProps<TFieldValues, TName>
+) {
+    const { name, control, rules, defaultValue, shouldUnregister, ...rest } = props;
+
+    const {
+        field: { onChange, value },
+        fieldState: { error, invalid },
+        formState,
+    } = useController({
+        name,
+        control,
+        rules,
+        defaultValue,
+        shouldUnregister,
+    });
+
+    return (
+        <div className="position-relative flex-grow-1">
+            <div className="d-flex flex-grow-1">
+                <MultiRadioToggle
+                    selectedItem={value}
+                    setSelectedItem={(x) => onChange(x)}
                     disabled={formState.isSubmitting}
                     {...rest}
                 />
