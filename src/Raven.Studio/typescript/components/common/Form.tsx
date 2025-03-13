@@ -698,3 +698,7 @@ export function FormGroup(props: FormGroupProps) {
 }
 
 export const FormLabel = Form.Label;
+
+export function OptionalLabel() {
+    return <small className="text-muted fw-light">(optional)</small>;
+}
