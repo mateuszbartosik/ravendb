@@ -108,6 +108,7 @@ declare module "yup" {
     interface StringSchema {
         basicUrl(msg?: string): this;
         base64(msg?: string): this;
+        ipv4(msg?: string): this;
     }
 }
 
@@ -157,6 +158,10 @@ function initYup() {
     yup.addMethod<yup.StringSchema>(yup.string, "base64", function (msg = "Please enter valid base64 string") {
         return this.matches(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/, msg);
     });
+    
+    yup.addMethod<yup.StringSchema>(yup.string, "ipv4", function (msg = "Please enter valid IPv4 address") {
+        return this.matches(/(^(\d{1,3}\.){3}(\d{1,3})$)/, msg);
+    })
 }
 
 export function commonInit() {
