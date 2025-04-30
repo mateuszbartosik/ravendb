@@ -53,7 +53,7 @@ public class SetupUnsecuredClusterUsingRvn : ClusterTestBase
             {
                 Console.Error.WriteLine(tuple.Exception.Message);
             }
-        }), CancellationToken.None);
+        }, SetupMode.Unsecured), CancellationToken.None);
 
         var settingsJsonObject = SetupManager.ExtractCertificatesAndSettingsJsonFromZip(zipBytes, "A",
             new JsonOperationContext(1024, 1024 * 4, 32 * 1024, SharedMultipleUseFlag.None),
@@ -127,7 +127,7 @@ public class SetupUnsecuredClusterUsingRvn : ClusterTestBase
             {
                 Console.Error.WriteLine(tuple.Exception.Message);
             }
-        }), CancellationToken.None);
+        }, SetupMode.Unsecured), CancellationToken.None);
 
         var settingsJsonObject = SetupManager.ExtractCertificatesAndSettingsJsonFromZip(zipBytes, "A",
             new JsonOperationContext(1024, 1024 * 4, 32 * 1024, SharedMultipleUseFlag.None),
