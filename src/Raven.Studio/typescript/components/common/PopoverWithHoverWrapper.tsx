@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { CSSProperties, ReactNode, useState } from "react";
 import { PopoverWithHover, PopoverWithHoverProps } from "./PopoverWithHover";
 import Popover from "react-bootstrap/Popover";
 import classNames from "classnames";
@@ -7,6 +7,8 @@ interface PopoverWithHoverWrapperProps extends Omit<PopoverWithHoverProps, "targ
     message: ReactNode | ReactNode[];
     isInPopoverBody?: boolean;
     inline?: boolean;
+    targetClassname?: string;
+    targetStyle?: CSSProperties;
 }
 
 export default function PopoverWithHoverWrapper({
@@ -14,12 +16,14 @@ export default function PopoverWithHoverWrapper({
     message,
     isInPopoverBody = true,
     inline = true,
+    targetClassname,
+    targetStyle,
     ...rest
 }: PopoverWithHoverWrapperProps) {
     const [target, setTarget] = useState<HTMLElement>();
     return (
         <>
-            <div ref={setTarget} className={classNames({ "d-inline-block": inline })}>
+            <div style={targetStyle} ref={setTarget} className={classNames(targetClassname, { "d-inline-block": inline })}>
                 {children}
             </div>
             {message && (
