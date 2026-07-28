@@ -22,7 +22,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/shadcn/ui/dialog";
-import { CdcPerformanceSection } from "@/pages/apps/cdc-performance-section";
+import { CdcSyncMini } from "@/pages/apps/cdc-sync-mini";
 
 type CreatedApp = { slug: string; name: string };
 
@@ -98,12 +98,7 @@ function AppCreatedDialog({ app, onContinue }: { app: CreatedApp | null; onConti
                             have to wait for it to finish.
                         </DialogDescription>
                     </DialogHeader>
-                    <CdcPerformanceSection
-                        slug={app.slug}
-                        title="Sync progress"
-                        loadingLabel="Connecting to the live data sync..."
-                        errorTitle="Could not connect to the live data sync"
-                    />
+                    <CdcSyncMini slug={app.slug} />
                     <DialogFooter>
                         <Button onClick={onContinue}>Continue</Button>
                     </DialogFooter>

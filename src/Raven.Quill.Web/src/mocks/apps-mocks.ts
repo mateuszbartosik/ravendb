@@ -119,6 +119,10 @@ export function sampleCdcProgressFrame(): CdcLiveRawFrame {
                             const scriptErrors = index === 2 ? 3 : 0;
                             const inProgress = index === 0;
 
+                            const readDurationInMs = Math.round(durationInMs * 0.22);
+                            const scriptDurationInMs = Math.round(durationInMs * 0.58);
+                            const writeDurationInMs = durationInMs - readDurationInMs - scriptDurationInMs;
+
                             return {
                                 Id: index,
                                 Started: new Date(startedMs).toISOString(),
@@ -128,6 +132,17 @@ export function sampleCdcProgressFrame(): CdcLiveRawFrame {
                                 NumberOfProcessedMessages: read - scriptErrors,
                                 ScriptProcessingErrorCount: scriptErrors,
                                 ReadErrorCount: 0,
+                                CurrentlyAllocated: { SizeInBytes: 2_000_000 + index * 40_000 },
+                                BatchPullStopReason: inProgress ? "In progress" : "Batch size reached",
+                                Details: {
+                                    Name: "Batch",
+                                    DurationInMs: durationInMs,
+                                    Operations: [
+                                        { Name: "Read", DurationInMs: readDurationInMs },
+                                        { Name: "Script", DurationInMs: scriptDurationInMs },
+                                        { Name: "Write", DurationInMs: writeDurationInMs },
+                                    ],
+                                },
                             };
                         }),
                     },

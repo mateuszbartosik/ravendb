@@ -11,6 +11,20 @@ export type CdcLiveRawBatch = {
     NumberOfProcessedMessages: number;
     ScriptProcessingErrorCount: number;
     ReadErrorCount: number;
+    Details?: CdcLiveRawOperation;
+    CurrentlyAllocated?: { SizeInBytes: number } | null;
+    BatchPullStopReason?: string | null;
+};
+
+export type CdcLiveRawOperation = {
+    Name: string;
+    DurationInMs: number;
+    Operations?: CdcLiveRawOperation[];
+};
+
+export type CdcPhase = {
+    name: string;
+    durationInMs: number;
 };
 
 export type CdcLiveRawFrame = {
@@ -27,6 +41,10 @@ export type CdcLiveBatch = {
     durationInMs: number;
     processed: number;
     errors: number;
+    read: number;
+    allocatedBytes: number | null;
+    stopReason: string | null;
+    phases: CdcPhase[];
 };
 
 export type CdcLiveStatus = "active" | "error" | "idle";
@@ -204,6 +222,19 @@ function shape(batches: Map<string, CdcLiveRawBatch>, totalBatches: number, nowM
             durationInMs: raw.DurationInMs,
             processed: raw.NumberOfProcessedMessages,
             errors: raw.ScriptProcessingErrorCount + raw.ReadErrorCount,
+            read: raw.NumberOfReadMessages,
+            allocatedBytes: raw.CurrentlyAllocated?.SizeInBytes ?? null,
+            stopReason: raw.BatchPullStopReason ?? null,
+            phases: flattenPhases(raw.Details),
         })),
     };
 }
+
+function flattenPhases(details: CdcLiveRawBatch["Details"]): CdcPhase[] {
+    return (details?.Operations ?? []).map((op) => ({ name: op.Name, durationInMs: op.DurationInMs }));
+}
+
+// Test-only seam: builds the same batch map `mergeFrame` would, from an ordered list of
+// raw batches, so pure-function tests can exercise `shape` without the WebSocket plumbing.
+export const shapeForTest = (raw: CdcLiveRawBatch[]) =>
+    shape(new Map(raw.map((b, i) => [String(i), b])), raw.length, Date.parse(raw.at(-1)!.Started) + 1);

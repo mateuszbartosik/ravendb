@@ -37,3 +37,25 @@ const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", cu
 export function formatCurrency(value: number): string {
     return currencyFormatter.format(value);
 }
+
+const KIBIBYTE = 1024;
+const MEBIBYTE = KIBIBYTE * 1024;
+const GIBIBYTE = MEBIBYTE * 1024;
+
+// Compact binary size, e.g. 3_020_000 -> "2.9 MB", 900 -> "900 bytes". Null (no allocation
+// reported yet) renders as "n/a".
+export function formatBytes(bytes: number | null): string {
+    if (bytes === null) {
+        return "n/a";
+    }
+    if (bytes >= GIBIBYTE) {
+        return `${(bytes / GIBIBYTE).toFixed(1)} GB`;
+    }
+    if (bytes >= MEBIBYTE) {
+        return `${(bytes / MEBIBYTE).toFixed(1)} MB`;
+    }
+    if (bytes >= KIBIBYTE) {
+        return `${Math.round(bytes / KIBIBYTE)} KB`;
+    }
+    return `${Math.round(bytes)} bytes`;
+}
