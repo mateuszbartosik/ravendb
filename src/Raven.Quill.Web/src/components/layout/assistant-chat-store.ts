@@ -12,6 +12,8 @@ export type AssistantMessage = {
     role: "user" | "assistant" | "error";
     text: string;
     relevantLinks?: AssistantRelevantLink[];
+    /** Questions the service suggests asking next; the composer offers the first as ghost text. */
+    followUpQuestions?: string[];
 };
 
 let messageIdCounter = 0;
@@ -34,6 +36,8 @@ type AssistantChatState = {
     conversationId: string | null;
     isStreaming: boolean;
     sendPrompt: (prompt: string) => Promise<void>;
+    /** Re-asks the last question, replacing the turn it produced. */
+    retryLastPrompt: () => Promise<void>;
     stopStreaming: () => void;
     clearMessages: () => void;
 };
@@ -86,7 +90,11 @@ export const useAssistantChatStore = create<AssistantChatState>((set, get) => ({
                     // An answer that came through empty would strand the "Thinking…" placeholder.
                     updateAnswer(
                         Response?.Answer
-                            ? { text: Response.Answer, relevantLinks: Response.RelevantLinks ?? [] }
+                            ? {
+                                  text: Response.Answer,
+                                  relevantLinks: Response.RelevantLinks ?? [],
+                                  followUpQuestions: Response.FollowUpQuestions ?? [],
+                              }
                             : { role: "error", text: "The AI assistant returned no answer." },
                     );
                     set({ conversationId: ConversationId ?? null });
@@ -117,6 +125,24 @@ export const useAssistantChatStore = create<AssistantChatState>((set, get) => ({
                 set({ isStreaming: false });
             }
         }
+    },
+    retryLastPrompt: async () => {
+        const { isStreaming, messages } = get();
+        if (isStreaming) {
+            return;
+        }
+
+        const lastPromptIndex = messages.findLastIndex((message) => message.role === "user");
+        if (lastPromptIndex === -1) {
+            return;
+        }
+
+        // Drop the turn being retried so the new answer replaces it rather than piling up beneath
+        // it. The conversation id stays put: upstream already saw the question, so the retry reads
+        // as a follow-up in the same conversation.
+        const prompt = messages[lastPromptIndex].text;
+        set({ messages: messages.slice(0, lastPromptIndex) });
+        await get().sendPrompt(prompt);
     },
     stopStreaming: () => {
         streamAbortController?.abort();

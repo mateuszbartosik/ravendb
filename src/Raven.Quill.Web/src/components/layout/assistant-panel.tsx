@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Pin, PinOff, Sparkles, Trash2, X } from "lucide-react";
+import { Pin, PinOff, Plus, X } from "lucide-react";
 import { useAssistantChatStore } from "@/components/layout/assistant-chat-store";
 import { AssistantComposer } from "@/components/layout/assistant-composer";
 import { AssistantConsentGate } from "@/components/layout/assistant-consent";
@@ -16,6 +16,8 @@ import {
 } from "@/components/layout/assistant-store";
 import { useAssistantConsent } from "@/components/layout/use-assistant-consent";
 import { Button } from "@/components/shadcn/ui/button";
+import { KbdSequence } from "@/components/shadcn/ui/kbd";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const RESIZE_KEYBOARD_STEP_PX = 16;
@@ -105,69 +107,105 @@ export function AssistantPanel() {
     const hasMessages = useAssistantChatStore((state) => state.messages.length > 0);
     const clearMessages = useAssistantChatStore((state) => state.clearMessages);
     const hasConsent = useAssistantConsent().data?.status === "Success";
+    // The opening question names the conversation, the way it does in the chat apps this panel
+    // borrows from — so the header says what is on screen rather than repeating the panel's name.
+    const conversationTitle = useAssistantChatStore(
+        (state) => state.messages.find((message) => message.role === "user")?.text,
+    );
 
     return (
-        <div
-            className={cn(
-                "relative flex min-h-0 flex-1 flex-col rounded-lg border bg-surface1 dark:bg-surface2",
-                isPinned ? "me-2 mb-2" : "shadow-xl",
-            )}
-            onKeyDown={(event) => {
-                // Escape dismisses the floating panel only; the docked one is part of the layout.
-                if (event.key === "Escape" && !isPinned) {
-                    setOpen(false);
-                }
-            }}
-        >
-            <AssistantResizeHandle axis="width" />
-            {!isPinned && <AssistantResizeHandle axis="height" />}
-            <header className="flex items-center gap-2 border-b px-3 py-2">
-                <Sparkles className="size-4 text-primary" aria-hidden="true" />
-                <h2 id={ASSISTANT_PANEL_TITLE_ID} className="text-sm font-semibold">
-                    AI assistant
-                </h2>
-                <div className="ml-auto flex items-center gap-1">
-                    <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={clearMessages}
-                        disabled={!hasMessages}
-                        aria-label="Clear conversation"
-                        title="Clear conversation"
-                    >
-                        <Trash2 aria-hidden="true" />
-                    </Button>
-                    {canPin && (
-                        <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setPinned(!isPinned)}
-                            aria-label={isPinned ? "Unpin AI assistant" : "Pin AI assistant"}
-                            title={isPinned ? "Unpin into a floating window" : "Pin into the layout"}
-                        >
-                            {isPinned ? <PinOff aria-hidden="true" /> : <Pin aria-hidden="true" />}
-                        </Button>
-                    )}
-                    <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setOpen(false)}
-                        aria-label="Close AI assistant"
-                        title="Close AI assistant"
-                    >
-                        <X aria-hidden="true" />
-                    </Button>
-                </div>
-            </header>
+        // Every icon-only control in the panel — header, message actions, composer — takes its
+        // label from a tooltip, so the provider sits at the root rather than around each one.
+        <TooltipProvider>
+            <div
+                className={cn(
+                    "relative flex min-h-0 flex-1 flex-col rounded-lg border bg-surface1 dark:bg-surface2",
+                    isPinned ? "me-2 mb-2" : "shadow-xl",
+                )}
+                onKeyDown={(event) => {
+                    // Escape dismisses the floating panel only; the docked one is part of the layout.
+                    if (event.key === "Escape" && !isPinned) {
+                        setOpen(false);
+                    }
+                }}
+            >
+                <AssistantResizeHandle axis="width" />
+                {!isPinned && <AssistantResizeHandle axis="height" />}
+                <header className="flex items-center gap-2 border-b px-3 py-2">
+                    <h2 id={ASSISTANT_PANEL_TITLE_ID} className="min-w-0 truncate text-sm font-semibold">
+                        {conversationTitle ? (
+                            <>
+                                {/* The landmark is labelled by this heading, so it keeps saying what
+                                    the panel is even once the title becomes the question. */}
+                                <span className="sr-only">AI assistant — </span>
+                                {conversationTitle}
+                            </>
+                        ) : (
+                            "AI assistant"
+                        )}
+                    </h2>
+                    <div className="ml-auto flex shrink-0 items-center gap-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    onClick={clearMessages}
+                                    disabled={!hasMessages}
+                                    aria-label="New conversation"
+                                >
+                                    <Plus aria-hidden="true" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                New conversation
+                                <KbdSequence keys={["Q", "N"]} />
+                            </TooltipContent>
+                        </Tooltip>
+                        {canPin && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon-sm"
+                                        onClick={() => setPinned(!isPinned)}
+                                        aria-label={isPinned ? "Unpin" : "Pin"}
+                                    >
+                                        {isPinned ? <PinOff aria-hidden="true" /> : <Pin aria-hidden="true" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {isPinned ? "Unpin" : "Pin"}
+                                    <KbdSequence keys={["Q", "P"]} />
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    onClick={() => setOpen(false)}
+                                    aria-label="Close"
+                                >
+                                    <X aria-hidden="true" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Close</TooltipContent>
+                        </Tooltip>
+                    </div>
+                </header>
 
-            {hasConsent ? (
-                <>
-                    <AssistantMessages />
-                    <AssistantComposer />
-                </>
-            ) : (
-                <AssistantConsentGate />
-            )}
-        </div>
+                {hasConsent ? (
+                    <>
+                        <AssistantMessages />
+
+                        <AssistantComposer />
+                    </>
+                ) : (
+                    <AssistantConsentGate />
+                )}
+            </div>
+        </TooltipProvider>
     );
 }

@@ -1,29 +1,12 @@
 import * as React from "react";
 
+import { REDUCED_MOTION_MEDIA_QUERY, useMediaQuery } from "@/lib/use-media-query";
+
 const Beams = React.lazy(() => import("@/components/auth/backgrounds/beams"));
 
 // A muted coral lifts the black beam geometry off the near-black background. Deliberately duller
 // than the ramp (brand-400 is #f08c6f) so the login screen stays quiet behind the form.
 const BEAM_TINT = "#9b6b5d";
-
-function usePrefersReducedMotion(): boolean {
-    const query = "(prefers-reduced-motion: reduce)";
-    const [reduced, setReduced] = React.useState(
-        () => typeof window !== "undefined" && window.matchMedia(query).matches,
-    );
-
-    React.useEffect(() => {
-        const mediaQuery = window.matchMedia(query);
-        const handleChange = () => setReduced(mediaQuery.matches);
-
-        handleChange();
-        mediaQuery.addEventListener("change", handleChange);
-
-        return () => mediaQuery.removeEventListener("change", handleChange);
-    }, []);
-
-    return reduced;
-}
 
 const BrandGlow = ({ strength = 16 }: { strength?: number }) => (
     <div
@@ -60,7 +43,7 @@ const DarkBeams = () => (
 );
 
 export function AuthBackground() {
-    const prefersReducedMotion = usePrefersReducedMotion();
+    const prefersReducedMotion = useMediaQuery(REDUCED_MOTION_MEDIA_QUERY);
 
     if (prefersReducedMotion) {
         return <BrandGlow />;

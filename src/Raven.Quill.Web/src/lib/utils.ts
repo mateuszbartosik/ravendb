@@ -53,6 +53,9 @@ export function formatRelativeTime(value: string | number) {
     return "now"; // sub-second differences
 }
 
+/** Decides whether a shortcut hint reads "⌘K" or "Ctrl K". */
+export const IS_MAC = typeof navigator !== "undefined" && navigator.platform.toUpperCase().includes("MAC");
+
 export async function copyToClipboard(value: string) {
     try {
         await navigator.clipboard.writeText(value);

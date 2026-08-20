@@ -10,12 +10,14 @@ import { CommandPalette } from "@/components/layout/command-palette";
 import { UserMenu } from "@/components/layout/user-menu";
 import { appRoutes } from "@/lib/app-routes";
 import { COMPACT_LAYOUT_MEDIA_QUERY, useMediaQuery } from "@/lib/use-media-query";
-import { cn } from "@/lib/utils";
+import { cn, IS_MAC } from "@/lib/utils";
 import { QuillMark } from "@/components/brand/quill-logo.tsx";
 import { AssistantPanel } from "@/components/layout/assistant-panel";
 import { ASSISTANT_PANEL_TITLE_ID, useAssistantPinning, useAssistantStore } from "@/components/layout/assistant-store";
+import { useAssistantShortcuts } from "@/components/layout/assistant-shortcuts";
 import { ContactSheet } from "@/components/layout/contact-sheet";
 import { Button } from "@/components/shadcn/ui/button";
+import { Kbd } from "@/components/shadcn/ui/kbd";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn/ui/tooltip";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "sidebar-collapsed";
@@ -42,6 +44,7 @@ function App() {
     const assistantWidthPx = useAssistantStore((state) => state.widthPx);
     const assistantHeightPx = useAssistantStore((state) => state.heightPx);
     const setAssistantOpen = useAssistantStore((state) => state.setOpen);
+    useAssistantShortcuts();
 
     // Routes like wizards start with a collapsed sidebar, but the user can still
     // expand it. Restore the stored preference when leaving such a route.
@@ -126,7 +129,10 @@ function App() {
                                     />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>AI assistant</TooltipContent>
+                            <TooltipContent>
+                                AI assistant
+                                <Kbd>{IS_MAC ? "⌘I" : "Ctrl I"}</Kbd>
+                            </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
                     <UserMenu />

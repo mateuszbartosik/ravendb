@@ -16,8 +16,8 @@ import {
 import { appNavigationSections, navigationItems } from "@/routes";
 import { appRoutes } from "@/lib/app-routes";
 import { THEME_OPTIONS } from "@/lib/theme-options";
+import { IS_MAC } from "@/lib/utils";
 
-const IS_MAC = typeof navigator !== "undefined" && navigator.platform.toUpperCase().includes("MAC");
 const DOCS_URL = "https://docs.ravendb.net/quill";
 
 type CommandPaletteProps = {

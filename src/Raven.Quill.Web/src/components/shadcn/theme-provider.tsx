@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 
+import { useMediaQuery } from "@/lib/use-media-query";
+
 export type Theme = "dark" | "light" | "system";
 type ResolvedTheme = "dark" | "light";
 
@@ -161,4 +163,20 @@ export const useTheme = () => {
     }
 
     return context;
+};
+
+/**
+ * Which of the two themes is actually on screen, with "system" already resolved. For the cases a
+ * CSS custom property cannot serve — a colour handed to a canvas or a shader, say — where the value
+ * has to be chosen in JavaScript rather than looked up by the cascade.
+ */
+export const useResolvedTheme = (): ResolvedTheme => {
+    const { theme } = useTheme();
+    const isSystemDark = useMediaQuery(COLOR_SCHEME_QUERY);
+
+    if (theme === "system") {
+        return isSystemDark ? "dark" : "light";
+    }
+
+    return theme;
 };
