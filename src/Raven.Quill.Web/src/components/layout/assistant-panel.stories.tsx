@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, waitFor, within } from "storybook/test";
+import { expect, spyOn, waitFor, within } from "storybook/test";
 import { AI_LICENSE_UNAVAILABLE_MESSAGE } from "@/api/custom-services/assistant-service";
 import { assistantMocks } from "@/mocks/assistant-mocks";
 import { defaultApiMocks } from "@/mocks/default-mocks";
@@ -31,6 +31,33 @@ export const ConsentGranted: Story = {
         const canvas = within(canvasElement);
 
         await waitFor(() => expect(canvas.getByRole("textbox", { name: /message the ai assistant/i })).toBeEnabled());
+    },
+};
+
+export const WithoutWebGl: Story = {
+    name: "Without WebGL",
+    // A browser with no usable GPU refuses every WebGL context, while 2D canvases keep working.
+    beforeEach: () => {
+        const getContext = HTMLCanvasElement.prototype.getContext;
+        const refuseWebGl = function (this: HTMLCanvasElement, contextId: string, options?: unknown) {
+            return contextId.startsWith("webgl") ? null : getContext.call(this, contextId, options);
+        } as typeof getContext;
+        const getContextSpy = spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(refuseWebGl);
+
+        return () => getContextSpy.mockRestore();
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // The empty-state animation loads lazily, so wait until it has asked for WebGL and been refused.
+        await waitFor(
+            () => expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("webgl2", expect.anything()),
+            { timeout: 10_000 },
+        );
+        await new Promise((resolve) => setTimeout(resolve));
+
+        expect(canvas.getByRole("heading", { name: /how can i help/i })).toBeVisible();
+        expect(canvas.getByRole("textbox", { name: /message the ai assistant/i })).toBeEnabled();
     },
 };
 

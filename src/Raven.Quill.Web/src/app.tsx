@@ -16,6 +16,9 @@ import QuillMark from "@/components/brand/quill-mark.svg?react";
 // AI assistant is held back for the release. Restore the commented-out imports and shell code below to bring it back.
 // import { AssistantPanel } from "@/components/layout/assistant-panel";
 // import { ASSISTANT_PANEL_TITLE_ID, useAssistantPinning, useAssistantStore } from "@/components/layout/assistant-store";
+// import { useAssistantShortcuts } from "@/components/layout/assistant-shortcuts";
+// import { Kbd } from "@/components/shadcn/ui/kbd";
+// import { IS_MAC } from "@/lib/utils";
 import { FeedbackSheet } from "@/components/layout/feedback-sheet";
 import { Heading } from "@/components/typography";
 import { PageContainer } from "@/components/page-container";
@@ -46,6 +49,7 @@ function App() {
     // const assistantWidthPx = useAssistantStore((state) => state.widthPx);
     // const assistantHeightPx = useAssistantStore((state) => state.heightPx);
     // const setAssistantOpen = useAssistantStore((state) => state.setOpen);
+    // useAssistantShortcuts();
 
     // Routes like wizards start with a collapsed sidebar, but the user can still
     // expand it. Restore the stored preference when leaving such a route.
@@ -130,7 +134,10 @@ function App() {
                                     />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>AI assistant</TooltipContent>
+                            <TooltipContent>
+                                AI assistant
+                                <Kbd>{IS_MAC ? "⌘I" : "Ctrl I"}</Kbd>
+                            </TooltipContent>
                         </Tooltip> */}
                         {/* A disabled button swallows pointer events, so the wrapper receives hover and focus for the tooltip. */}
                         <Tooltip>

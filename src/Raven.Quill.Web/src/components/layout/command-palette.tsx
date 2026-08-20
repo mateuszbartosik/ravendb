@@ -18,8 +18,7 @@ import { appRoutes } from "@/lib/app-routes";
 import { DOCS_URL } from "@/lib/help-links";
 import { THEME_OPTIONS } from "@/lib/theme-options";
 import { Text } from "@/components/typography";
-
-const IS_MAC = typeof navigator !== "undefined" && navigator.platform.toUpperCase().includes("MAC");
+import { IS_MAC } from "@/lib/utils";
 
 type CommandPaletteProps = {
     slug?: string;
